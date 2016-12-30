@@ -2,7 +2,7 @@ cmake_minimum_required( VERSION 3.0)
 
 project( GLguide)
 
-set( EXEC_NAME "version")
+set( EXEC_NAME "window")
 set( SOURCE_LIB "${PROJECT_SOURCE_DIR}/src")
 set( CMAKE_BINARY_DIR "${PROJECT_SOURCE_DIR}/bin")
 set( CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmodules")
