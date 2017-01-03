@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <stdio.h>
 #include "global.h"
 
 using namespace std;
@@ -14,6 +16,7 @@ int main( int argc, char* argv[]) {
 		}
 	glfwMakeContextCurrent( window);
 
+	glewInit();
 	while( !glfwWindowShouldClose( window)) {
 		glViewport( 0, 0, w, h);
 		glClearColor( 0.2, 0.4, 0.5, 1.0);
@@ -24,10 +27,10 @@ int main( int argc, char* argv[]) {
 		glfwSwapBuffers( window);
 		glfwPollEvents();
 	}
+	
 
 	glfwDestroyWindow( window);
 	glfwTerminate();
 
 	return 0;
 }
-

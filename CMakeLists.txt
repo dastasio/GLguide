@@ -1,18 +1,44 @@
-cmake_minimum_required( VERSION 3.0)
+cmake_minimum_required( VERSION 2.8)
 
 project( GLguide)
-
 set( EXEC_NAME "window")
+
+set( EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin")
+set( LIBRARY_OUTPUT_PATH ${EXECUTABLE_OUTPUT_PATH})
 set( SOURCE_LIB "${PROJECT_SOURCE_DIR}/src")
-set( CMAKE_BINARY_DIR "${PROJECT_SOURCE_DIR}/bin")
 set( CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmodules")
 
-find_package( GLFW REQUIRED)
-find_package( GLEW REQUIRED)
+message( "system name: " ${CMAKE_SYSTEM})
+message( "system processor: " ${CMAKE_SYSTEM_PROCESSOR})
+
+
+if( ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	set( SYSWINDOWS 1)
+	message( "detected Windows system")
+	link_directories( ${PROJECT_SOURCE_DIR}/win/glew/lib)
+else()
+	set( SYSUNIX 1)
+	message( "detected Unix system")
+endif()
 find_package( OpenGL REQUIRED)
 
-add_subdirectory( ${SOURCE_LIB})
+# building GLFW
+set( GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set( GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+SET( GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 add_executable( ${EXEC_NAME} "main.cpp")
-target_link_libraries( ${EXEC_NAME} my_lib ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLEW_LIBRARIES})
-include_directories( ${EXEC_NAME} ${SOURCE_LIB} ${OPENGL_INCLUDE_DIR} ${GLFW_INCLUDE_DIR} ${GLFW_INCLUDE_DIR})
+add_subdirectory( ${SOURCE_LIB}) # adding my library
+add_subdirectory( ${PROJECT_SOURCE_DIR}/glfw) # adding glfw library
+
+target_link_libraries( ${EXEC_NAME} my_lib ${OPENGL_LIBRARIES} glfw)
+include_directories( ${SOURCE_LIB} ${OPENGL_INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/glfw/include)
+
+if( SYSUNIX)
+	find_package( GLEW REQUIRED)
+	target_link_libraries( ${EXEC_NAME} ${GLEW_LIBRARIES})
+	include_directories( ${GLEW_INCLUDE_DIR})
+elseif( SYSWINDOWS)
+	target_link_libraries( ${EXEC_NAME} glew32s opengl32)
+	include_directories( ${PROJECT_SOURCE_DIR}/win/glew/include)
+endif()

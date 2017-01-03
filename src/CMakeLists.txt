@@ -1,1 +1,12 @@
-add_library( my_lib SHARED global.h common.h common.cpp)
+link_directories( ${PROJECT_SOURCE_DIR}/win/glew/lib)
+add_library( my_lib STATIC global.h common.h common.cpp) 
+target_link_libraries( my_lib ${OPENGL_LIBRARIES} glfw)
+include_directories( ${OPENGL_INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/glfw/include)
+
+if( SYSUNIX)
+	target_link_libraries( my_lib ${GLEW_LIBRARIES})
+	include_directories( ${GLEW_INCLUDE_DIR})
+elseif( SYSWINDOWS)
+	target_link_libraries( my_lib glew32s opengl32)
+	include_directories( ${PROJECT_SOURCE_DIR}/win/glew/include)
+endif()
