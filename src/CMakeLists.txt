@@ -1,5 +1,5 @@
 link_directories( ${PROJECT_SOURCE_DIR}/win/glew/lib)
-add_library( my_lib STATIC global.h common.h common.cpp) 
+add_library( my_lib STATIC global.h common.h common.cpp glfw_wind.h glfw_wind.cpp) 
 target_link_libraries( my_lib ${OPENGL_LIBRARIES} glfw)
 include_directories( ${OPENGL_INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/glfw/include)
 

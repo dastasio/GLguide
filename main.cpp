@@ -12,7 +12,7 @@ int main( int argc, char* argv[]) {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	GLFWwindow* window = glfwCreateWindow(640, 480, "Hello GLFW!", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(1024, 720, "Hello GLFW!", nullptr, nullptr);
 	if (window == nullptr) {
 		printf("Failed to create GLFW window!");
 		glfwTerminate();
@@ -30,13 +30,19 @@ int main( int argc, char* argv[]) {
 	// setting OpenGL viewport
 	int w, h;
 	glfwGetFramebufferSize(window, &w, &h);
-	
 	glViewport(0, 0, w, h);
 
+	// setting key callback function
+	glfwSetKeyCallback(window, key_callback);
+
+	// setting clear color
+	glClearColor(0.2, 0.45, 0.5, 1.0);
 
 	// program loop
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
+
+		glClear(GL_COLOR_BUFFER_BIT);
 		glfwSwapBuffers(window);
 	}
 

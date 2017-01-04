@@ -13,5 +13,6 @@
 
 // including personal library
 #include "common.h"
+#include "glfw_wind.h"
 
 #endif // GLOBAL_H
