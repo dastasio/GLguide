@@ -1,87 +1,86 @@
 #include "common.h"
 
-// read file in a NULL-terminated string
-static char* readShaderSource( const char* shaderFile) {
-	FILE* fp = fopen( shaderFile, "r");
-
-	if( fp == NULL) { return NULL; }
-
-	fseek( fp, 0L, SEEK_END);
-	long size = ftell(fp);
-
-	fseek(fp, 0L, SEEK_SET);
-	char* buf = new char[size + 1];
-	fread( buf, 1, size, fp);
-
-	buf[size] = '\0';
-	fclose(fp);
-	
-	// DEBUGGING HELPprintf( "%s\n\n", buf);
-	return buf;
-}
+#define VSHADER "shader.vert"
+#define FSHADER "shader.frag"
 
 // create GLSL program object from vertex and fragment shaders
 GLuint InitShader( const char* vShaderFile, const char* fShaderFile) {
-	struct Shader {
-		const char*	filename;
-		GLenum		type;
-		GLchar*		source;
-	} shaders[2] = {
-		{	vShaderFile, GL_VERTEX_SHADER, NULL },
-		{	fShaderFile, GL_FRAGMENT_SHADER, NULL }
-	};
+	// reading shader sources
+		const GLchar* vertexSource =
+		#include VSHADER
+			;
+		const GLchar* fragmentSource =
+		#include FSHADER
+			;
 
-	GLuint program = glCreateProgram( );
+		if (vertexSource == NULL) {
+			std::cout << "FAILED TO READ " << VSHADER << std::endl;
+			exit(EXIT_FAILURE);
+		}
+		if (fragmentSource == NULL) {
+			std::cout << "FAILED TO READ " << FSHADER << std::endl;
+			exit(EXIT_FAILURE);
+		}
+	// read shader sources
 
-	for( int i = 0; i < 2; ++i) {
-		Shader& s = shaders[i];
-		s.source = readShaderSource( s.filename);
-		if( shaders[i].source == NULL) {
-			std::cerr << "Failed to read " << s.filename << std::endl;
-			exit( EXIT_FAILURE);
+	// success flag for shaders compilation
+	GLint success;
+
+	// creating vertShader and fragShader objects
+		// creating vertex shader
+		GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
+
+		// attaching source code to vertex shader object
+		glShaderSource(vertShader, 1, &vertexSource, NULL);
+
+		// compiling vertex shader
+		glCompileShader(vertShader);
+
+		// checking for successful compilation (VERTEX)
+		GLchar infoLog[512];
+		glGetShaderiv(vertShader, GL_COMPILE_STATUS, &success);
+		if (!success) {
+			glGetShaderInfoLog(vertShader, 512, NULL, infoLog);
+			std::cout << "FAILED TO COMPILE VERTEX SHADER!\n" << infoLog << std::endl;
+			exit(EXIT_FAILURE);
 		}
 
-		GLuint shader = glCreateShader( s.type);
-		glShaderSource( shader, 1, (const GLchar**) &s.source, NULL);
-		glCompileShader( shader);
 
-		GLint compiled;
-		glGetShaderiv( shader, GL_COMPILE_STATUS, &compiled);
-		if( !compiled) {
-			std::cerr << s.filename << ", failed to compile:" << std::endl;
-			GLint logSize;
-			glGetShaderiv( shader, GL_INFO_LOG_LENGTH, &logSize);
-			char* logMsg = new char[logSize];
-			glGetShaderInfoLog( shader, logSize, NULL, logMsg);
-			std::cerr << logMsg << std::endl;
-			delete [] logMsg;
-			exit( EXIT_FAILURE);
+
+		// creating fragment shader
+		GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
+		glShaderSource(fragShader, 1, &fragmentSource, NULL);
+		glCompileShader(fragShader);
+
+		// checking for successful compilation (FRAGMENT)
+		glGetShaderiv(fragShader, GL_COMPILE_STATUS, &success);
+		if (!success) {
+			glGetShaderInfoLog(fragShader, 512, NULL, infoLog);
+			std::cout << "FAILED TO COMPILE FRAGMENT SHADER!\n" << infoLog << std::endl;
+			exit(EXIT_FAILURE);
 		}
+	// created vertShader and fragShader objects
 
-		delete [] s.source;
+	// creating shader program
+	GLuint program;
+	program = glCreateProgram();
 
-		glAttachShader( program, shader);
+	// linking shaders
+	glAttachShader(program, vertShader);
+	glAttachShader(program, fragShader);
+	glLinkProgram(program);
+
+
+	// checking for successful linking
+	glGetProgramiv(program, GL_LINK_STATUS, &success);
+	if (!success) {
+		glGetProgramInfoLog(program, 512, NULL, infoLog);
+		std::cout << "FAILED TO LINK SHADER PROGRAM:\n" << infoLog << std::endl;
+		exit(EXIT_FAILURE);
 	}
 
-	// link and error check
-	glLinkProgram( program);
-
-	GLint linked;
-	glGetProgramiv( program, GL_LINK_STATUS, &linked );
-	if( !linked) {
-		std::cerr << "Shader program failed to link" << std::endl;
-		GLint logSize;
-		glGetProgramiv( program, GL_INFO_LOG_LENGTH, &logSize);
-		char* logMsg = new char[logSize];
-		glGetProgramInfoLog( program, logSize, NULL, logMsg);
-		std::cerr << logMsg << std::endl;
-		delete [] logMsg;
-
-		exit( EXIT_FAILURE);
-	}
-
-	// use program object
-	glUseProgram( program);
-
+	// deleting shaders
+	glDeleteShader(vertShader);
+	glDeleteShader(fragShader);
 	return program;
 }

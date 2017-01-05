@@ -38,11 +38,15 @@ int main( int argc, char* argv[]) {
 	// setting clear color
 	glClearColor(0.2, 0.45, 0.5, 1.0);
 
+	initTriangle();
+
 	// program loop
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 
-		glClear(GL_COLOR_BUFFER_BIT);
+		// rendering screen
+		display();
+
 		glfwSwapBuffers(window);
 	}
 
