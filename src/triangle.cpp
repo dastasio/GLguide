@@ -1,13 +1,18 @@
 #include "triangle.h"
 
-GLuint gVAO, gVBO;
+GLuint gVAO, gVBO, gEBO;
 using namespace glm;
 
 void initTriangle() {
 	vec3 vertices[] = {
-		vec3( -0.5, -0.5, 0.0),
+		vec3(  0.5,  0.5, 0.0),
 		vec3(  0.5, -0.5, 0.0),
-		vec3(  0.0,  0.5, 0.0)
+		vec3( -0.5, -0.5, 0.0),
+		vec3( -0.5,  0.5, 0.0)
+	};
+	GLuint indices[] = {
+		0, 1, 3,
+		1, 2, 3
 	};
 	
 	// compiling shaders
@@ -20,6 +25,9 @@ void initTriangle() {
 	// creating new Vertex Array Object (VAO)
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
+	// creating new element buffer object (EBO)
+	GLuint ebo;
+	glGenBuffers(1, &ebo);
 
 	// configuring vao
 	glBindVertexArray(vao);
@@ -29,11 +37,15 @@ void initTriangle() {
 		// sending position vertices
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (GLvoid*)0);
 		glEnableVertexAttribArray(0);
+		// copying element array on GPU ( ebo)
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	// unbinding to avoid misconfiguration
 	glBindVertexArray(0);
 
 	gVAO = vao;
 	gVBO = vbo;
+	gEBO = ebo;
 }
 
 void display() {
@@ -42,6 +54,6 @@ void display() {
 
 	// drawing triangle
 	glBindVertexArray(gVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
