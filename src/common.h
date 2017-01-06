@@ -3,6 +3,6 @@
 #define BUFFER_OFFSET(bytes)  (( GLvoid*) (bytes))
 #include "global.h"
 
-GLuint InitShader( const char* vShaderFile, const char* fShaderFile);
+void InitShader();
 
 #endif // COMMON_H

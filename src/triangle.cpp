@@ -1,5 +1,6 @@
 #include "triangle.h"
 
+GLuint gProgram[2];
 GLuint vao[2], vbo[2];
 using namespace glm;
 
@@ -16,8 +17,8 @@ void initTriangle() {
 	};
 	
 	// compiling shaders
-	GLuint program = InitShader("shader.vert", "shader.frag");
-	glUseProgram(program);
+	InitShader();
+	glUseProgram(gProgram[0]);
 
 	// creating new Vertex Buffer Object (VBO)
 	glGenBuffers(2, vbo);
@@ -50,9 +51,11 @@ void display() {
 	// clearing screen
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	glUseProgram(gProgram[0]);
 	// drawing triangle
 	glBindVertexArray(vao[0]);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glUseProgram(gProgram[1]);
 	glBindVertexArray(vao[1]);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	glBindVertexArray(0);
