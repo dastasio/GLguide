@@ -12,7 +12,7 @@ int main( int argc, char* argv[]) {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	GLFWwindow* window = glfwCreateWindow(1024, 720, "Hello GLFW!", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(1024, 720, "Double Triangle!", nullptr, nullptr);
 	if (window == nullptr) {
 		printf("Failed to create GLFW window!");
 		glfwTerminate();
