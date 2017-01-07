@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 3.1)
 
 project( GLguide)
-set( EXEC_NAME "DoubleTr")
+set( EXEC_NAME "Shaders")
 
 set( EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin")
 set( LIBRARY_OUTPUT_PATH ${EXECUTABLE_OUTPUT_PATH})
