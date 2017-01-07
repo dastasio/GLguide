@@ -4,7 +4,7 @@
 #define FSHADER "shader.frag"
 
 // create GLSL program object from vertex and fragment shaders
-GLuint InitShader( const char* vShaderFile, const char* fShaderFile) {
+GLuint InitShader() {
 	// reading shader sources
 		const GLchar* vertexSource =
 		#include VSHADER

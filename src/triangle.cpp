@@ -5,18 +5,16 @@ using namespace glm;
 
 void initTriangle() {
 	vec3 vertices[] = {
-		vec3(  0.5,  0.5, 0.0),
-		vec3(  0.5, -0.5, 0.0),
 		vec3( -0.5, -0.5, 0.0),
-		vec3( -0.5,  0.5, 0.0)
+		vec3(  0.0,  0.5, 0.0),
+		vec3(  0.5, -0.5, 0.0)
 	};
 	GLuint indices[] = {
-		0, 1, 3,
-		1, 2, 3
+		0, 1, 2
 	};
 	
 	// compiling shaders
-	GLuint program = InitShader("shader.vert", "shader.frag");
+	GLuint program = InitShader();
 	glUseProgram(program);
 
 	// creating new Vertex Buffer Object (VBO)
