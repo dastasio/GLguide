@@ -1,9 +1,10 @@
 R"SHADER(
 #version 330 core
 
-out vec4 color;
+in vec3 vertex_Position;
+out vec4 out_color;
 
 void main() {
-	color = vec4( 1.0, 0.5, 0.2, 1.0);
+	out_color = vec4(vertex_Position.rgb, 1.0);
 }
 )SHADER"

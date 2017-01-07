@@ -1,14 +1,13 @@
 #include "triangle.h"
 
-GLint offsetLocation;
 GLuint vao, vbo;
 using namespace glm;
 
 void initTriangle() {
 	vec3 v1[] = {
-		vec3( -0.5, -0.5, 0),
-		vec3(  0.0,  0.5, 0),
-		vec3(  0.5, -0.5, 0)
+		vec3( -0.5, -0.5 , 0),
+		vec3(  0.0,  0.75, 0),
+		vec3(  0.5, -0.5 , 0)
 	};
 	
 	// compiling shaders
@@ -30,20 +29,14 @@ void initTriangle() {
 		glEnableVertexAttribArray(0);
 	// unbinding to avoid misconfiguration
 	glBindVertexArray(0);
-
-	offsetLocation = glGetUniformLocation(program, "Xoffset");
 }
 
 void display() {
-	static GLfloat offset = 0.0;
 	// clearing screen
 	glClear(GL_COLOR_BUFFER_BIT);
-	glUniform1f(offsetLocation, (sinf(offset) / 2));
 
 	// drawing triangle
 	glBindVertexArray(vao);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	glBindVertexArray(0);
-
-	offset += 0.02;
 }
