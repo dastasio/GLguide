@@ -1,9 +1,13 @@
 R"SHADER(
 #version 330 core
 
-out vec4 color;
+in vec2 texCoords;
+in vec3 vertex_color;
+out vec4 final_color;
+
+uniform sampler2D finalTexture;
 
 void main() {
-	color = vec4( 1.0, 0.5, 0.2, 1.0);
+	final_color = texture( finalTexture, texCoords) * vec4(vertex_color, 1.0);
 }
 )SHADER"

@@ -3,3 +3,4 @@
 
 void initTriangle();
 void display();
+void initTexture();

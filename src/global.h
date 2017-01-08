@@ -19,5 +19,6 @@
 #include "common.h"
 #include "glfw_wind.h"
 #include "triangle.h"
+#include "textures.h"
 
 #endif // GLOBAL_H

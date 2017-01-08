@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 3.1)
 
 project( GLguide)
-set( EXEC_NAME "Shaders")
+set( EXEC_NAME "Texture")
 
 set( EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin")
 set( LIBRARY_OUTPUT_PATH ${EXECUTABLE_OUTPUT_PATH})
@@ -30,14 +30,16 @@ SET( GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set( GLM_STATIC_LIBRARY_ENABLE ON CACHE BOOL "" FORCE)
 
 add_executable( ${EXEC_NAME} "main.cpp")
+add_subdirectory( ${PROJECT_SOURCE_DIR}/soil) # soil library
 add_subdirectory( ${SOURCE_LIB}) # adding my library
 add_subdirectory( ${PROJECT_SOURCE_DIR}/glfw) # adding glfw library
 add_subdirectory( ${PROJECT_SOURCE_DIR}/glm) # adding glm library
 
+
 # setting c++ version
 target_compile_features( ${EXEC_NAME} PRIVATE cxx_nullptr)
 
-target_link_libraries( ${EXEC_NAME} my_lib ${OPENGL_LIBRARIES} glfw glm_static)
+target_link_libraries( ${EXEC_NAME} my_lib ${OPENGL_LIBRARIES} glfw glm_static SOIL)
 include_directories( ${SOURCE_LIB} ${PROJECT_SOURCE_DIR} ${OPENGL_INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/glfw/include)
 
 if( SYSUNIX)
