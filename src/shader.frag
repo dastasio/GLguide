@@ -5,9 +5,10 @@ in vec2 texCoords;
 in vec3 vertex_color;
 out vec4 final_color;
 
-uniform sampler2D finalTexture;
+uniform sampler2D mTexture1;
+uniform sampler2D mTexture2;
 
 void main() {
-	final_color = texture( finalTexture, texCoords) * vec4(vertex_color, 1.0);
+	final_color = mix( texture( mTexture1, texCoords), texture( mTexture2, texCoords), 0.2);
 }
 )SHADER"

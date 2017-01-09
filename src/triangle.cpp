@@ -1,6 +1,6 @@
 #include "triangle.h"
 
-GLuint gVAO, gVBO, gEBO, gTex;
+GLuint gProgram, gVAO, gVBO, gEBO, gTex[2];
 using namespace glm;
 
 void initTriangle() {
@@ -23,11 +23,12 @@ void initTriangle() {
 	};
 	
 	// loading texture file container.jpg
-	gTex = loadTexture("container.jpg");
+	gTex[0] = loadTexture("container.jpg");
+	gTex[1] = loadTexture("awesomeface.png");
 	
 	// compiling shaders
-	GLuint program = InitShader();
-	glUseProgram(program);
+	gProgram = InitShader();
+	glUseProgram(gProgram);
 	
 	// creating new Vertex Buffer Object (VBO)
 	glGenBuffers(1, &gVBO);
@@ -64,11 +65,17 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	// drawing triangle
-	glBindTexture(GL_TEXTURE_2D, gTex);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, gTex[0]);
+	glUniform1i(glGetUniformLocation(gProgram, "mTexture1"), 0);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, gTex[1]);
+	glUniform1i(glGetUniformLocation(gProgram, "mTexture2"), 1);
+
+
 	glBindVertexArray(gVAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
-	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void initTexture() {
