@@ -9,7 +9,6 @@ uniform sampler2D mTexture1;
 uniform sampler2D mTexture2;
 
 void main() {
-	vec2 cords = vec2( 1 - texCoords.x, texCoords.y);
-	final_color = mix( texture( mTexture1, -texCoords), texture( mTexture2, cords), 0.2);
+	final_color = mix( texture( mTexture1, texCoords), texture( mTexture2, 5 * texCoords), 0.3);
 }
 )SHADER"
