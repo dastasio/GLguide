@@ -1,7 +1,9 @@
 #include "triangle.h"
 
-GLuint gProgram, gVAO, gVBO, gEBO, gTex[2];
+
 using namespace glm;
+mat4 transMatrix;
+GLuint gProgram, gVAO, gVBO, gEBO, gTex[2];
 
 void initTriangle() {
 	vec2 vertices[] = {
@@ -58,9 +60,18 @@ void initTriangle() {
 	// unbinding to avoid misconfiguration
 	glBindVertexArray(0);
 
+
+	// initializing transformation matrix
+	vec3 transl = vec3(0.5, 0.5, 0.0);
+	GLfloat rot = radians(90.0);
+	vec3 scale = vec3(0.5, 0.5, 0.5);
+	transMatrix = transform(transl, rot, scale);
 }
 
 void display() {
+	// sending transformation matrix
+	glUniformMatrix4fv(glGetUniformLocation(gProgram, "transform"), 1, GL_FALSE, &transMatrix[0][0]);
+
 	// clearing screen
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -86,4 +97,18 @@ void initTexture() {
 	// setting parameters for texture sampling
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+}
+
+
+mat4 transform(vec3 t = vec3(0,0,0), GLfloat angl = 0.0, vec3 s = vec3(1,1,1)) {
+	mat4 matrix = mat4(1.0);
+
+	// scaling
+	matrix = scale(matrix, s);
+	// rotating
+	matrix = rotate(matrix, angl, vec3(0.0, 0.0, 1.0));
+	// translating
+	matrix = translate(matrix, t);
+
+	return matrix;
 }
