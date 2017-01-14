@@ -60,17 +60,12 @@ void initTriangle() {
 	// unbinding to avoid misconfiguration
 	glBindVertexArray(0);
 
-
-	// initializing transformation matrix
-	vec3 transl = vec3(0.5, 0.5, 0.0);
-	GLfloat rot = radians(90.0);
-	vec3 scale = vec3(0.5, 0.5, 0.5);
-	transMatrix = transform(transl, rot, scale);
 }
 
 void display() {
-	// sending transformation matrix
-	glUniformMatrix4fv(glGetUniformLocation(gProgram, "transform"), 1, GL_FALSE, &transMatrix[0][0]);
+	static GLfloat rotation = 0.0, scale = 0.0;
+
+	
 
 	// clearing screen
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -85,8 +80,21 @@ void display() {
 
 
 	glBindVertexArray(gVAO);
+	// drawing bottom right square
+	transMatrix = transform(vec3(0.7, -0.7, 0.0), radians(rotation), vec3(0.6, 0.6, 0.6));
+	// sending transformation matrix
+	glUniformMatrix4fv(glGetUniformLocation(gProgram, "transform"), 1, GL_FALSE, &transMatrix[0][0]);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+	// drawing top left square
+	transMatrix = transform(vec3(-0.5, 0.5, 0.0), 0.0, vec3(sinf(scale)));
+	// sending transformation matrix
+	glUniformMatrix4fv(glGetUniformLocation(gProgram, "transform"), 1, GL_FALSE, &transMatrix[0][0]);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
+
+	rotation += 0.5;
+	scale += 0.01;
 }
 
 void initTexture() {
@@ -102,13 +110,13 @@ void initTexture() {
 
 mat4 transform(vec3 t = vec3(0,0,0), GLfloat angl = 0.0, vec3 s = vec3(1,1,1)) {
 	mat4 matrix = mat4(1.0);
-
-	// scaling
-	matrix = scale(matrix, s);
-	// rotating
-	matrix = rotate(matrix, angl, vec3(0.0, 0.0, 1.0));
+	
 	// translating
 	matrix = translate(matrix, t);
+	// rotating
+	matrix = rotate(matrix, angl, vec3(0.0, 0.0, 1.0));
+	// scaling
+	matrix = scale(matrix, s);
 
 	return matrix;
 }
