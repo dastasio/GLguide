@@ -12,7 +12,8 @@ int main( int argc, char* argv[]) {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	GLFWwindow* window = glfwCreateWindow(1024, 720, "Hello GLFW!", nullptr, nullptr);
+	GLfloat width = 1024, height = 720;
+	GLFWwindow* window = glfwCreateWindow(width, height, "Hello GLFW!", nullptr, nullptr);
 	if (window == nullptr) {
 		printf("Failed to create GLFW window!");
 		glfwTerminate();
@@ -38,7 +39,7 @@ int main( int argc, char* argv[]) {
 	// setting clear color
 	glClearColor(0.2, 0.45, 0.5, 1.0);
 
-	initTriangle();
+	initTriangle( width, height);
 
 	// program loop
 	while (!glfwWindowShouldClose(window)) {

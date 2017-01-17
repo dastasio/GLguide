@@ -1,5 +1,4 @@
-#ifndef GLOBAL_H
-#define GLOBAL_H
+#pragma once
 
 // including external libraries
 #include <stdlib.h>
@@ -20,5 +19,3 @@
 #include "glfw_wind.h"
 #include "triangle.h"
 #include "textures.h"
-
-#endif // GLOBAL_H

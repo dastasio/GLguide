@@ -1,11 +1,11 @@
 #include "triangle.h"
 
-
 using namespace glm;
-mat4 transMatrix;
+mat4 model, view, projection;
 GLuint gProgram, gVAO, gVBO, gEBO, gTex[2];
+GLint mLoc, vLoc, pLoc;
 
-void initTriangle() {
+void initTriangle( GLfloat w, GLfloat h) {
 	vec2 vertices[] = {
 		// positions		| texture coordinates
 		vec2( -0.5, -0.5),	vec2(  0.0,  0.0),	// bottom left
@@ -23,6 +23,13 @@ void initTriangle() {
 		vec3( 0.0, 0.0, 1.0),
 		vec3( 1.0, 1.0, 0.0)
 	};
+
+
+	// creating transformation matrices
+	model = rotate(model, radians(-55.f), vec3(1.0, 0.0, 0.0));
+	view = translate(view, vec3(0.0, 0.0, -3.0));
+	projection = perspective(radians(45.f), w / h, 0.1f, 100.0f);
+
 	
 	// loading texture file container.jpg
 	gTex[0] = loadTexture("container.jpg");
@@ -61,16 +68,17 @@ void initTriangle() {
 	glBindVertexArray(0);
 
 
-	// initializing transformation matrix
-	vec3 transl = vec3(0.5, 0.5, 0.0);
-	GLfloat rot = radians(90.0);
-	vec3 scale = vec3(0.5, 0.5, 0.5);
-	transMatrix = transform(transl, rot, scale);
+	// finding matrices locations
+	mLoc = glGetUniformLocation(gProgram, "model");
+	vLoc = glGetUniformLocation(gProgram, "view");
+	pLoc = glGetUniformLocation(gProgram, "projection");
 }
 
 void display() {
-	// sending transformation matrix
-	glUniformMatrix4fv(glGetUniformLocation(gProgram, "transform"), 1, GL_FALSE, &transMatrix[0][0]);
+	// sending transformation matrices
+	glUniformMatrix4fv(mLoc, 1, GL_FALSE, &model[0][0]);
+	glUniformMatrix4fv(vLoc, 1, GL_FALSE, &view[0][0]);
+	glUniformMatrix4fv(pLoc, 1, GL_FALSE, &projection[0][0]);
 
 	// clearing screen
 	glClear(GL_COLOR_BUFFER_BIT);
