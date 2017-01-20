@@ -4,9 +4,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
+#include <vector>
 #define GLEW_STATIC
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include <SDL2/sdl.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_opengl.h>
+
 
 // glm library
 #include "glm/glm.hpp"
@@ -16,6 +20,6 @@
 
 // including personal library
 #include "common.h"
-#include "glfw_wind.h"
-#include "triangle.h"
+#include "cube.h"
 #include "textures.h"
+#include "dav_sdl.h"

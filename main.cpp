@@ -6,51 +6,12 @@ using namespace std;
 
 int main( int argc, char* argv[]) {
 	// initalizing GLFW
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+	//glfwInit();
 
-	GLfloat width = 1024, height = 720;
-	GLFWwindow* window = glfwCreateWindow(width, height, "Hello GLFW!", nullptr, nullptr);
-	if (window == nullptr) {
-		printf("Failed to create GLFW window!");
-		glfwTerminate();
-		return -1;
-	}
-	glfwMakeContextCurrent(window);
+	App* cubeApp = new App();
 
-	// initializing GLEW
-	glewExperimental = GL_TRUE;
-	if (glewInit() != GLEW_OK) {
-		printf("Failed to initalize GLEW!");
-		return -1;
-	}
+	cubeApp->loop();
 
-	// setting OpenGL viewport
-	int w, h;
-	glfwGetFramebufferSize(window, &w, &h);
-	glViewport(0, 0, w, h);
-
-	// setting key callback function
-	glfwSetKeyCallback(window, key_callback);
-
-	// setting clear color
-	glClearColor(0.2, 0.45, 0.5, 1.0);
-
-	initTriangle( width, height);
-
-	// program loop
-	while (!glfwWindowShouldClose(window)) {
-		glfwPollEvents();
-
-		// rendering screen
-		display();
-
-		glfwSwapBuffers(window);
-	}
-
-	glfwTerminate();
+	//glfwTerminate();
 	return 0;
 }
