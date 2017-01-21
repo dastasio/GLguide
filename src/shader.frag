@@ -9,6 +9,6 @@ uniform sampler2D texContainer;
 
 void main() {
 	vec2 Coordinates = vec2( texCoords.x, 1 - texCoords.y);
-	final_color = mix( texture( texContainer, Coordinates), texture( texSmile, Coordinates), 0.2);
+	final_color = /*vec4( 1.0, 1.0, 0.6, 1.0) */ mix( texture( texContainer, Coordinates), texture( texSmile, Coordinates), 0.2);
 }
 )SHADER"

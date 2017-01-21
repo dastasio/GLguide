@@ -10,9 +10,8 @@ uniform mat4 view;
 uniform mat4 projection;
 
 out vec2 texCoords;
-out vec3 vertex_color;
 void main() {
-	gl_Position = projection * view * model * vec4( position.xyz, 1.0);
+	gl_Position = /*projection * view * model * */vec4( position.xyz, 1.0);
 	texCoords = textureCoordinates;
 }
 )SHADER"

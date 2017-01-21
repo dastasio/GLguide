@@ -7,17 +7,13 @@ App::App() {
 	view = mat4(1.0);
 	projection = mat4(1.0);
 
-
-	resizable = GL_FALSE;
-
 	initWindow();
 	initCube();
 	initBuffers();
 	initMatrices();
-	initTexture();
 
-	//texSmile = loadTexture("awesomeface.png");
-	//texCont = loadTexture("container.jpg");
+	texSmile = loadTexture("awesomeface.png");
+	texCont = loadTexture("container.jpg");
 
 	locModel = glGetUniformLocation(gProgram, "model");
 	locView = glGetUniformLocation(gProgram, "view");
@@ -40,8 +36,9 @@ App::~App() {
 - s.e.: starts a window using GLFW
 */
 GLvoid App::initWindow() {
-	thisWindow = initSDL( thisContext);
+	thisWindow = initSDL( thisContext, width, height);
 
+	glViewport(0, 0, width, height);
 	// setting clear color
 	glClearColor(0.2, 0.45, 0.5, 1.0);
 }
@@ -109,8 +106,11 @@ GLvoid App::initBuffers() {
 	glBufferSubData(GL_ARRAY_BUFFER, sizeof(cube), sizeof(texCoordinates), &texCoordinates);
 	// VAO setup
 	glBindVertexArray(VAO);
+		initTexture();
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(sizeof(cube)));
+		glEnableVertexAttribArray(1);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BO[1]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices, GL_STATIC_DRAW);
@@ -173,16 +173,24 @@ GLvoid App::render() {
 	glUniformMatrix4fv(locView, 1, GL_FALSE, value_ptr(view));
 	glUniformMatrix4fv(locProj, 1, GL_FALSE, value_ptr(projection));
 	
+	glBindBuffer(GL_ARRAY_BUFFER, BO[0]);
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, 54, GL_INT, 0);
 	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	SDL_GL_SwapWindow(thisWindow);
 }
 
 
 GLvoid App::loop() {
-	while (true) {
+	SDL_Event ev;
+	GLboolean run = GL_TRUE;
+	while ( run) {
+		SDL_PollEvent(&ev);
+		if (ev.type == SDL_QUIT) {
+			run = GL_FALSE;
+		}
 		render();
 
 		// rotating cube

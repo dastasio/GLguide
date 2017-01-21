@@ -25,13 +25,11 @@ private:
 	// matrices
 	glm::mat4 model, view, projection;
 	GLint locModel, locView, locProj;
-
 	// OpenGL buffers
 	GLuint VAO, BO[2], gProgram;
 
 	// window settings
 	const GLint width = 1024, height = 720;
-	GLboolean resizable;
 
 	GLuint texSmile, texCont;
 
