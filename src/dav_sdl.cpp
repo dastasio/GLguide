@@ -1,6 +1,6 @@
 #include "dav_sdl.h"
 
-SDL_Window* initSDL( GLint w, GLint h) {
+SDL_Window* initSDL( SDL_GLContext &context,GLint w, GLint h) {
 
 	// initializing SDL_VIDEO
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -10,7 +10,7 @@ SDL_Window* initSDL( GLint w, GLint h) {
 	else {
 		// if SDL has initialized, create window
 		SDL_Window* window = SDL_CreateWindow("OPENGL CUBE", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, 
-				SDL_WINDOW_OPENGL);
+				SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
 		if (window == nullptr) {
 			std::cerr << "ERROR: Could not create SDL window!\n" << SDL_GetError();
 			exit(EXIT_FAILURE);
@@ -20,9 +20,10 @@ SDL_Window* initSDL( GLint w, GLint h) {
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-			SDL_GLContext context = SDL_GL_CreateContext(window);
+			SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+			context = SDL_GL_CreateContext(window);
 			
-			if (context == nullptr) {
+			if (context == NULL) {
 				std::cerr << "ERROR: Could not create an OpenGL 3.3 Context!\n" << SDL_GetError();
 				exit(EXIT_FAILURE);
 			}
@@ -42,10 +43,10 @@ SDL_Window* initSDL( GLint w, GLint h) {
 				}
 				else {
 					std::cout << "INIT SUCCESS: SDL initialized successfully!\n";
+					glViewport(0, 0, w, h);
 					return window;
 				}
 			}
-			
 		}
 	}
 }

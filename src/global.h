@@ -7,7 +7,11 @@
 #include <vector>
 #define GLEW_STATIC
 #include <GL/glew.h>
-#include <SDL2/sdl.h>
+
+#ifdef _WIN32
+#define SDL_MAIN_HANDLED
+#endif
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_opengl.h>
 

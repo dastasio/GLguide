@@ -40,7 +40,7 @@ App::~App() {
 - s.e.: starts a window using GLFW
 */
 GLvoid App::initWindow() {
-	thisWindow = initSDL();
+	thisWindow = initSDL( thisContext);
 
 	// setting clear color
 	glClearColor(0.2, 0.45, 0.5, 1.0);

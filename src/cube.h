@@ -36,4 +36,5 @@ private:
 	GLuint texSmile, texCont;
 
 	SDL_Window* thisWindow;
+	SDL_GLContext thisContext;
 };
