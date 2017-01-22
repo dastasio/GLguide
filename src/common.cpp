@@ -85,7 +85,8 @@ GLuint InitShader() {
 	return program;
 }
 
-
+// creates GLfloat vector whose elements are taken
+// from the given arrays in an alternating way
 std::vector<GLfloat> toVec5(glm::vec3 v3[], glm::vec2 v2[]) {
 	if (ARRAY_SIZE(v3) / 3 != ARRAY_SIZE(v2) / 2) {
 		std::cerr << "ERROR: incorrect use of function 'toVec5'" << std::endl;
