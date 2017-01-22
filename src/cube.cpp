@@ -12,9 +12,6 @@ App::App() {
 	initBuffers();
 	initMatrices();
 
-	texSmile = loadTexture("awesomeface.png");
-	texCont = loadTexture("container.jpg");
-
 	locModel = glGetUniformLocation(gProgram, "model");
 	locView = glGetUniformLocation(gProgram, "view");
 	locProj = glGetUniformLocation(gProgram, "projection");
@@ -44,19 +41,16 @@ GLvoid App::initWindow() {
 }
 
 
-
-
 /* initCube();
 - parameters: VOID
 - returns: VOID
-- s.e.: initializes cube vertices in vec3 array (cube)
-		and texture coordinates in vec2 array (texCoordinates)
-		and texture object
+- s.e.: initializes cube vertices and texture coordinates 
+		in GLfloat array (cube)
 */
 GLvoid App::initCube() {
 	
 	// setting up coordinates
-	cube = {
+	vec3 vertices[] = {
 		vec3( -0.5, -0.5,  0.5),	vec3(  0.5, -0.5,  0.5),	// 0  1
 		vec3(  0.5,  0.5,  0.5),	vec3( -0.5,  0.5,  0.5),	// 2  3
 
@@ -64,7 +58,7 @@ GLvoid App::initCube() {
 		vec3(  0.5,  0.5, -0.5),	vec3( -0.5,  0.5, -0.5)		// 6  7
 	};
 
-	texCoordinates = {
+	vec2 tCoords[] = {
 		vec2(  0.0,  0.0),	vec2(  1.0,  0.0),	// 0  1
 		vec2(  1.0,  1.0),	vec2(  0.0,  1.0),	// 2  3
 
@@ -72,8 +66,10 @@ GLvoid App::initCube() {
 		vec2(  0.0,  0.0),	vec2(  1.0,  0.0)	// 6  7
 	};
 
+	cube = toVec5(vertices, tCoords);
+
 	// setting up vertex indices
-	indices = {
+	indices = new GLint[36] {
 		0, 1, 2,	2, 3, 0,
 		0, 3, 4,	4, 3, 7,
 		1, 5, 6,	6, 2, 1,
@@ -100,16 +96,16 @@ GLvoid App::initBuffers() {
 	glGenBuffers(2, BO);
 	glGenVertexArrays(1, &VAO);
 
-	// sending cube data to GPU
-	glBindBuffer( GL_ARRAY_BUFFER, BO[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cube) + sizeof(texCoordinates), &cube, GL_STATIC_DRAW);
-	glBufferSubData(GL_ARRAY_BUFFER, sizeof(cube), sizeof(texCoordinates), &texCoordinates);
+	
 	// VAO setup
 	glBindVertexArray(VAO);
+		// sending cube data to GPU
+		glBindBuffer(GL_ARRAY_BUFFER, BO[0]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * cube.size(), &cube.begin(), GL_STATIC_DRAW);
 		initTexture();
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), BUFFER_OFFSET(0));
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(sizeof(cube)));
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), BUFFER_OFFSET( 3 * sizeof(GLfloat)));
 		glEnableVertexAttribArray(1);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BO[1]);
@@ -148,6 +144,13 @@ GLvoid App::initMatrices() {
 GLvoid App::initTexture() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+
+	texSmile = loadTexture("awesomeface.png");
+	texCont = loadTexture("container.jpg");
 }
 
 
@@ -158,6 +161,7 @@ GLvoid App::initTexture() {
 		sends uniform variables to GLSL
 */
 GLvoid App::render() {
+	glUseProgram(gProgram);
 	glClear(GL_COLOR_BUFFER_BIT);
 	
 	// setting textures

@@ -8,6 +8,11 @@ SDL_Window* initSDL( SDL_GLContext &context,GLint w, GLint h) {
 		exit(EXIT_FAILURE);
 	}
 	else {
+		// OpenGL context settings
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		// if SDL has initialized, create window
 		SDL_Window* window = SDL_CreateWindow("OPENGL CUBE", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, 
 				SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
@@ -17,10 +22,6 @@ SDL_Window* initSDL( SDL_GLContext &context,GLint w, GLint h) {
 		}
 		else {
 			// creating opengl context
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-			SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 			context = SDL_GL_CreateContext(window);
 			
 			if (context == NULL) {
@@ -29,6 +30,7 @@ SDL_Window* initSDL( SDL_GLContext &context,GLint w, GLint h) {
 			}
 			else {
 				// if context created successfully, init GLEW
+				SDL_GL_MakeCurrent(window, context);
 				glewExperimental = GL_TRUE;
 				GLenum gErr = glewInit();
 				if (gErr != GLEW_OK) {

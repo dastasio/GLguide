@@ -18,9 +18,8 @@ public:
 private:
 	GLvoid render();
 
-	std::vector<glm::vec3> cube;
-	std::vector<glm::vec2> texCoordinates;
-	std::vector<GLint> indices;
+	std::vector<GLfloat> cube;
+	GLint* indices;
 
 	// matrices
 	glm::mat4 model, view, projection;
