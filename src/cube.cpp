@@ -21,7 +21,7 @@ App::~App() {
 	// deallocating memory
 
 	delete &VAO;
-	delete[] BO;
+	delete &VBO;
 }
 
 
@@ -38,6 +38,9 @@ GLvoid App::initWindow() {
 	glViewport(0, 0, width, height);
 	// setting clear color
 	glClearColor(0.2, 0.45, 0.5, 1.0);
+
+	// setting depth buffer test
+	glEnable(GL_DEPTH_TEST);
 }
 
 
@@ -49,34 +52,7 @@ GLvoid App::initWindow() {
 */
 GLvoid App::initCube() {
 	
-	// setting up coordinates
-	vec3 vertices[] = {
-		vec3( -0.5, -0.5,  0.5),	vec3(  0.5, -0.5,  0.5),	// 0  1
-		vec3(  0.5,  0.5,  0.5),	vec3( -0.5,  0.5,  0.5),	// 2  3
 
-		vec3( -0.5, -0.5, -0.5),	vec3(  0.5, -0.5, -0.5),	// 4  5
-		vec3(  0.5,  0.5, -0.5),	vec3( -0.5,  0.5, -0.5)		// 6  7
-	};
-
-	vec2 tCoords[] = {
-		vec2(  0.0,  0.0),	vec2(  1.0,  0.0),	// 0  1
-		vec2(  1.0,  1.0),	vec2(  0.0,  1.0),	// 2  3
-
-		vec2(  1.0,  1.0),	vec2(  0.0,  1.0),	// 4  5
-		vec2(  0.0,  0.0),	vec2(  1.0,  0.0)	// 6  7
-	};
-
-	cube = toVec5(vertices, tCoords);
-
-	// setting up vertex indices
-	indices = new GLint[36] {
-		0, 1, 2,	2, 3, 0,
-		0, 3, 4,	4, 3, 7,
-		1, 5, 6,	6, 2, 1,
-		4, 5, 6,	6, 7, 4,
-		5, 1, 0,	0, 4, 5,
-		3, 7, 6,	6, 2, 3
-	};
 }
 
 
@@ -93,25 +69,22 @@ GLvoid App::initBuffers() {
 	gProgram = InitShader();
 	glUseProgram(gProgram);
 
-	glGenBuffers(2, BO);
+	glGenBuffers(1, &VBO);
 	glGenVertexArrays(1, &VAO);
 
 	
 	// VAO setup
 	glBindVertexArray(VAO);
 		// sending cube data to GPU
-		glBindBuffer(GL_ARRAY_BUFFER, BO[0]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * cube.size(), &cube.begin(), GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(cube), cube, GL_STATIC_DRAW);
 		initTexture();
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), BUFFER_OFFSET(0));
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), BUFFER_OFFSET( 3 * sizeof(GLfloat)));
 		glEnableVertexAttribArray(1);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BO[1]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices, GL_STATIC_DRAW);
 	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 
@@ -142,14 +115,7 @@ GLvoid App::initMatrices() {
  - s.e.: initializes texture settings
 */
 GLvoid App::initTexture() {
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-
-	texSmile = loadTexture("awesomeface.png");
+	texSmile = loadTexture("awesomeface.jpg");
 	texCont = loadTexture("container.jpg");
 }
 
@@ -162,7 +128,7 @@ GLvoid App::initTexture() {
 */
 GLvoid App::render() {
 	glUseProgram(gProgram);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	// setting textures
 	glActiveTexture(GL_TEXTURE0);
@@ -177,9 +143,9 @@ GLvoid App::render() {
 	glUniformMatrix4fv(locView, 1, GL_FALSE, value_ptr(view));
 	glUniformMatrix4fv(locProj, 1, GL_FALSE, value_ptr(projection));
 	
-	glBindBuffer(GL_ARRAY_BUFFER, BO[0]);
 	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, 54, GL_INT, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
