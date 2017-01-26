@@ -8,7 +8,6 @@ App::App() {
 	projection = mat4(1.0);
 
 	initWindow();
-	initCube();
 	initBuffers();
 	initMatrices();
 
@@ -47,12 +46,10 @@ GLvoid App::initWindow() {
 /* initCube();
 - parameters: VOID
 - returns: VOID
-- s.e.: initializes cube vertices and texture coordinates 
-		in GLfloat array (cube)
+- s.e.: initializes projection matrix
 */
-GLvoid App::initCube() {
-	
-
+GLvoid App::initProjection(GLfloat fov, GLfloat ar) {
+	projection = perspective(fov, ar, 0.1f, 100.0f);
 }
 
 
@@ -105,7 +102,7 @@ GLvoid App::initMatrices() {
 	view = translate(view, vec3(0.0, 0.0, -3.0));
 
 	// projection matrix
-	projection = perspective(45.f, GLfloat(width / height), 0.1f, 100.f);
+	initProjection();
 }
 
 
@@ -127,6 +124,9 @@ GLvoid App::initTexture() {
 		sends uniform variables to GLSL
 */
 GLvoid App::render() {
+
+	static mat4 ref_model = mat4(1.0);
+
 	glUseProgram(gProgram);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
@@ -139,21 +139,28 @@ GLvoid App::render() {
 	glUniform1i(glGetUniformLocation(gProgram, "texSmile"), 1);
 	
 	// sending matrices
-	glUniformMatrix4fv(locModel, 1, GL_FALSE, value_ptr(model));
 	glUniformMatrix4fv(locView, 1, GL_FALSE, value_ptr(view));
 	glUniformMatrix4fv(locProj, 1, GL_FALSE, value_ptr(projection));
 	
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
+	for (int i = 0; i < 10; ++i) {
+		model = translate(mat4(1.0), cubePositions[i]);
+		model = rotate(model, i * 0.3f, vec3(1.0, 0.3, 0.5));
+		model = ref_model * model;
+		glUniformMatrix4fv(locModel, 1, GL_FALSE, value_ptr(model));
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	ref_model = rotate(ref_model, radians(0.5f), vec3(0.5, 1.0, 0.0));
 	SDL_GL_SwapWindow(thisWindow);
 }
 
 
 GLvoid App::loop() {
+
 	SDL_Event ev;
 	GLboolean run = GL_TRUE;
 	while ( run) {
@@ -162,8 +169,19 @@ GLvoid App::loop() {
 			run = GL_FALSE;
 		}
 		render();
+		const GLubyte* keystate = SDL_GetKeyboardState(nullptr);
+		static GLfloat fov = radians(45.0f);
+		static GLfloat ar = 1.42f;
 
-		// rotating cube
-		model = rotate(model, radians(0.5f), vec3(0.5, 1.0, 0.0));
+		if (keystate[SDL_SCANCODE_UP]) {
+			fov += 0.05;
+			if (fov >= M_PI / 2) fov = M_PI / 2;
+			initProjection(fov);
+		}
+		if (keystate[SDL_SCANCODE_DOWN]) {
+			fov -= 0.05;
+			if (fov <= 0.1) fov = 0.1;
+			initProjection(fov);
+		}
 	}
 }
