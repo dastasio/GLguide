@@ -1,8 +1,9 @@
 link_directories( ${PROJECT_SOURCE_DIR}/win/glew/lib)
 link_directories( ${PROJECT_SOURCE_DIR}/win/SDL2/lib)
 
-add_library( my_lib STATIC global.h common.h common.cpp glfw_wind.h glfw_wind.cpp cube.h
-	textures.cpp textures.h cube.cpp dav_sdl.cpp dav_sdl.h shader.vert shader.frag) 
+add_library( my_lib STATIC global.h common.h common.cpp glfw_wind.h glfw_wind.cpp app.h
+	textures.cpp textures.h app.cpp dav_sdl.cpp dav_sdl.h camera.h camera.cpp
+	shader.vert shader.frag) 
 
 target_link_libraries( my_lib ${OPENGL_LIBRARIES} glm_static)
 include_directories( ${OPENGL_INCLUDE_DIR} ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/glfw/include)

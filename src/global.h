@@ -24,6 +24,7 @@
 
 // including personal library
 #include "common.h"
-#include "cube.h"
+#include "app.h"
 #include "textures.h"
 #include "dav_sdl.h"
+#include "camera.h"
