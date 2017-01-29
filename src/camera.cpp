@@ -6,11 +6,7 @@ Camera::Camera() {
 	camSpace = mat4(1.0);
 	pos = vec3(0.0, 0.0, 3.0);
 
-	//U = normalize(vec3(0.0, 1.0, 0.0));
-	//N = normalize(vec3(1.0, 0.0, 0.0));
-	//V = normalize(cross(N, U));
-
-	pointCamera(pos,pos + vec3(0.0, 0.0,-1.0), vec3( 0.0, 1.0, 0.0));
+	pointCamera(pos,vec3(0.0, 0.0,-1.0), vec3( 0.0, 1.0, 0.0));
 }
 
 Camera::~Camera() {
@@ -18,6 +14,7 @@ Camera::~Camera() {
 	delete &U;
 	delete &V;
 	delete &N;
+	delete &camSpace;
 }
 
 
@@ -28,17 +25,19 @@ Camera::~Camera() {
 */
 GLvoid Camera::move( camEnum dir, GLfloat speed) {
 	switch (dir) {
-		case CAM_MOVE_RIGHT:
-			pos += normalize(cross(N, U)) * speed;
-			break;
+	case CAM_MOVE_RIGHT:
+		pos += normalize(cross(N, U)) * speed;
+		break;
 
-		case CAM_MOVE_FORWARD:
-			pos += N * speed;
-			break;
+	case CAM_MOVE_FORWARD:
+		pos += N * speed;
+		break;
 
-		case CAM_MOVE_UP:
-			pos += U * speed;
-			break;
+	case CAM_MOVE_UP:
+		pos += U * speed;
+		break;
+	default:
+		break;
 	}
 
 	pointCamera( pos, N, U);
@@ -50,24 +49,17 @@ GLvoid Camera::move( camEnum dir, GLfloat speed) {
  - returns: VOID
  - s.e.: calls pointCamera
 */
-GLvoid Camera::turn( GLboolean vertical, GLfloat angle) {
-	mat4 r;
-	// if rotation is horizontal
-	if (!vertical) {
-		// rotate target vector along UP vector by given angle
-		r = rotate(mat4(1.0), angle, vec3(0.0, 1.0, 0.0));
-		vec4 tmp = r * vec4(N, 1.0);
-		N = vec3(tmp.x, tmp.y, tmp.z);
+GLvoid Camera::turn(camEnum dir, GLfloat angle) {
+	GLfloat c = cosf(angle), s = sinf(angle);
+	switch (dir) {
+	case CAM_ROT_YAW:
+		N = rotate(N, angle, U);
+		break;
+	case CAM_ROT_PITCH:
+		N = rotate(N, angle, V);
+		break;
 	}
-	// if rotation is vertical
-	else {
-		// rotate target and up vectors along RIGHT vector by given angle
-		r = rotate(mat4(1.0), angle, vec3(1.0, 0.0, 0.0));
-		vec4 tmp = r * vec4(N, 1.0);
-		N = vec3(tmp.x, tmp.y, tmp.z);
-		tmp = r * vec4(U, 1.0);
-		U = vec3(tmp.x, tmp.y, tmp.z);
-	}
+
 	pointCamera( pos, N, U);
 }
 
@@ -82,7 +74,7 @@ GLvoid Camera::pointCamera( vec3 p, vec3 target, vec3 up) {
 	N = normalize(target);
 	U = normalize(up);
 	V = normalize(cross(N, U));
-	camSpace = lookAt(p, p - target, up);
+	camSpace = lookAt(pos, pos + N, U);
 }
 
 

@@ -182,7 +182,7 @@ GLboolean App::grabInput() {
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 
 	GLbitfield mouseState;
-	static GLint newX = 0, newY = 0;
+	GLint mX, mY;
 	const GLubyte* keystate = SDL_GetKeyboardState(nullptr);
 	static GLfloat fov = radians(45.0f);
 	static GLfloat ar = 1.42f;
@@ -203,16 +203,16 @@ GLboolean App::grabInput() {
 		return GL_FALSE;
 	}
 	if (keystate[SDL_SCANCODE_W]) {
-		cam->move(CAM_MOVE_FORWARD, -speed);
-	}
-	if (keystate[SDL_SCANCODE_S]) {
 		cam->move(CAM_MOVE_FORWARD, speed);
 	}
+	if (keystate[SDL_SCANCODE_S]) {
+		cam->move(CAM_MOVE_FORWARD, -speed);
+	}
 	if (keystate[SDL_SCANCODE_A]) {
-		cam->move(CAM_MOVE_RIGHT, speed);
+		cam->move(CAM_MOVE_RIGHT, -speed);
 	}
 	if (keystate[SDL_SCANCODE_D]) {
-		cam->move(CAM_MOVE_RIGHT, -speed);
+		cam->move(CAM_MOVE_RIGHT, speed);
 	}
 	if (keystate[SDL_SCANCODE_LSHIFT]) {
 		cam->move(CAM_MOVE_UP, speed);
@@ -222,12 +222,10 @@ GLboolean App::grabInput() {
 	}
 
 	// reading mouse input
-	//mouseState = SDL_GetRelativeMouseState(&newX, &newY);
-	//if (mouseState & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-	//	cam->turn(GL_FALSE, (newX / width) * 2 * M_PI);
-	//	cam->turn(GL_TRUE, (newY / height) * 2 * M_PI);
-	//}
-
-	//std::cout << "X: " << newX << "\tY: " << newY << std::endl;
+	mouseState = SDL_GetRelativeMouseState(&mX, &mY);
+	if (mouseState & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+		cam->turn(CAM_ROT_YAW, -(mX / width) * 2 * M_PI);
+		cam->turn(CAM_ROT_PITCH, -(mY / height) * 2 * M_PI);
+	}
 	return GL_TRUE;
 }

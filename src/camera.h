@@ -4,7 +4,9 @@
 enum camEnum {
 	CAM_MOVE_UP,
 	CAM_MOVE_RIGHT,
-	CAM_MOVE_FORWARD
+	CAM_MOVE_FORWARD,
+	CAM_ROT_PITCH,
+	CAM_ROT_YAW
 };
 
 class Camera {
@@ -13,7 +15,7 @@ public:
 	~Camera();
 
 	GLvoid move(camEnum dir, GLfloat speed);
-	GLvoid turn(GLboolean vertical, GLfloat angle);
+	GLvoid turn(camEnum dir, GLfloat angle);
 	
 	GLvoid pointCamera( glm::vec3 p, glm::vec3 target, glm::vec3 up);
 
