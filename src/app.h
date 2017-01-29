@@ -14,6 +14,7 @@ public:
 	GLvoid initMatrices();
 	GLvoid initTexture();
 
+	GLboolean grabInput();
 	GLvoid loop();
 private:
 	GLvoid render();

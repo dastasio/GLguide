@@ -3,3 +3,4 @@ build/
 bin/
 Win32/
 x64/
+Cube.dir/

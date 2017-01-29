@@ -6,12 +6,13 @@ public:
 	Camera();
 	~Camera();
 
-	GLvoid move( glm::vec3 m);
+	GLvoid move(GLboolean hor, GLfloat speed);
 	GLvoid turn(GLboolean vertical, GLfloat angle);
 	
-	GLvoid pointCamera( glm::vec3 target, glm::vec3 up);
+	GLvoid pointCamera( glm::vec3 p, glm::vec3 target, glm::vec3 up);
 
-	glm::mat4 getMatrix() { return camSpace; };
+	glm::mat4 getMatrix() { return camSpace; }
+	glm::vec3 getPosition() { return pos; }
 private:
 
 	glm::vec3 pos;

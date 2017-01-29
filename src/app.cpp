@@ -149,14 +149,14 @@ GLvoid App::render() {
 	for (int i = 0; i < 10; ++i) {
 		model = translate(mat4(1.0), cubePositions[i]);
 		model = rotate(model, i * 0.3f, vec3(1.0, 0.3, 0.5));
-		model = ref_model * model;
+		model = model;// *ref_model;
 		glUniformMatrix4fv(locModel, 1, GL_FALSE, value_ptr(model));
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	ref_model = rotate(ref_model, radians(0.5f), vec3(0.5, 1.0, 0.0));
+	ref_model = rotate(ref_model, radians(0.2f), vec3(0.5, 1.0, 0.0));
 	SDL_GL_SwapWindow(thisWindow);
 }
 
@@ -171,21 +171,56 @@ GLvoid App::loop() {
 			run = GL_FALSE;
 		}
 		render();
-		const GLubyte* keystate = SDL_GetKeyboardState(nullptr);
-		static GLfloat fov = radians(45.0f);
-		static GLfloat ar = 1.42f;
-
-		if (keystate[SDL_SCANCODE_UP]) {
-			fov += 0.05;
-			if (fov >= M_PI / 2) fov = M_PI / 2;
-			initProjection(fov);
-		}
-		if (keystate[SDL_SCANCODE_DOWN]) {
-			fov -= 0.05;
-			if (fov <= 0.1) fov = 0.1;
-			initProjection(fov);
-		}
+		run = grabInput();
 
 		view = cam->getMatrix();
 	}
+}
+
+
+GLboolean App::grabInput() {
+	SDL_SetRelativeMouseMode(SDL_TRUE);
+
+	GLbitfield mouseState;
+	static GLint newX = 0, newY = 0;
+	const GLubyte* keystate = SDL_GetKeyboardState(nullptr);
+	static GLfloat fov = radians(45.0f);
+	static GLfloat ar = 1.42f;
+
+	// reading keyboard input
+	if (keystate[SDL_SCANCODE_UP]) {
+		fov += 0.05;
+		if (fov >= M_PI / 2) fov = M_PI / 2;
+		initProjection(fov);
+	}
+	if (keystate[SDL_SCANCODE_DOWN]) {
+		fov -= 0.05;
+		if (fov <= 0.1) fov = 0.1;
+		initProjection(fov);
+	}
+	if (keystate[SDL_SCANCODE_ESCAPE]) {
+		return GL_FALSE;
+	}
+	if (keystate[SDL_SCANCODE_W]) {
+		cam->move(GL_FALSE, -0.1f);
+	}
+	if (keystate[SDL_SCANCODE_S]) {
+		cam->move(GL_FALSE, 0.1f);
+	}
+	if (keystate[SDL_SCANCODE_A]) {
+		cam->move(GL_TRUE, 0.1f);
+	}
+	if (keystate[SDL_SCANCODE_D]) {
+		cam->move(GL_TRUE, -0.1f);
+	}
+
+	// reading mouse input
+	//mouseState = SDL_GetRelativeMouseState(&newX, &newY);
+	//if (mouseState & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+	//	cam->turn(GL_FALSE, (newX / width) * 2 * M_PI);
+	//	cam->turn(GL_TRUE, (newY / height) * 2 * M_PI);
+	//}
+
+	//std::cout << "X: " << newX << "\tY: " << newY << std::endl;
+	return GL_TRUE;
 }
