@@ -1,12 +1,18 @@
 #pragma once
 #include "global.h"
 
+enum camEnum {
+	CAM_MOVE_UP,
+	CAM_MOVE_RIGHT,
+	CAM_MOVE_FORWARD
+};
+
 class Camera {
 public:
 	Camera();
 	~Camera();
 
-	GLvoid move(GLboolean hor, GLfloat speed);
+	GLvoid move(camEnum dir, GLfloat speed);
 	GLvoid turn(GLboolean vertical, GLfloat angle);
 	
 	GLvoid pointCamera( glm::vec3 p, glm::vec3 target, glm::vec3 up);

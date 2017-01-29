@@ -26,12 +26,19 @@ Camera::~Camera() {
  - returns: VOID
  - s.e.: updates private 'pos' vector with camera new position
 */
-GLvoid Camera::move( GLboolean hor, GLfloat speed) {
-	if (hor) {
-		pos += normalize(cross(N, U)) * speed;
-	}
-	else {
-		pos += N * speed;
+GLvoid Camera::move( camEnum dir, GLfloat speed) {
+	switch (dir) {
+		case CAM_MOVE_RIGHT:
+			pos += normalize(cross(N, U)) * speed;
+			break;
+
+		case CAM_MOVE_FORWARD:
+			pos += N * speed;
+			break;
+
+		case CAM_MOVE_UP:
+			pos += U * speed;
+			break;
 	}
 
 	pointCamera( pos, N, U);

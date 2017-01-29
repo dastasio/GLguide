@@ -187,6 +187,7 @@ GLboolean App::grabInput() {
 	static GLfloat fov = radians(45.0f);
 	static GLfloat ar = 1.42f;
 
+	GLfloat speed = 0.2;
 	// reading keyboard input
 	if (keystate[SDL_SCANCODE_UP]) {
 		fov += 0.05;
@@ -202,16 +203,22 @@ GLboolean App::grabInput() {
 		return GL_FALSE;
 	}
 	if (keystate[SDL_SCANCODE_W]) {
-		cam->move(GL_FALSE, -0.1f);
+		cam->move(CAM_MOVE_FORWARD, -speed);
 	}
 	if (keystate[SDL_SCANCODE_S]) {
-		cam->move(GL_FALSE, 0.1f);
+		cam->move(CAM_MOVE_FORWARD, speed);
 	}
 	if (keystate[SDL_SCANCODE_A]) {
-		cam->move(GL_TRUE, 0.1f);
+		cam->move(CAM_MOVE_RIGHT, speed);
 	}
 	if (keystate[SDL_SCANCODE_D]) {
-		cam->move(GL_TRUE, -0.1f);
+		cam->move(CAM_MOVE_RIGHT, -speed);
+	}
+	if (keystate[SDL_SCANCODE_LSHIFT]) {
+		cam->move(CAM_MOVE_UP, speed);
+	}
+	if (keystate[SDL_SCANCODE_LCTRL]) {
+		cam->move(CAM_MOVE_UP, -speed);
 	}
 
 	// reading mouse input
