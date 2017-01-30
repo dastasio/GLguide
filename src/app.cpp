@@ -3,12 +3,14 @@
 using namespace glm;
 
 Camera* cam = new Camera();
+Obj* cube;
 
 App::App() {
 	model = mat4(1.0);
 	view = cam->getMatrix();
 	projection = mat4(1.0);
 
+	initCube();
 	initWindow();
 	initBuffers();
 	initMatrices();
@@ -23,7 +25,7 @@ App::~App() {
 
 	delete &VAO;
 	delete &VBO;
-
+	
 	delete cam;
 }
 
@@ -78,7 +80,8 @@ GLvoid App::initBuffers() {
 	glBindVertexArray(VAO);
 		// sending cube data to GPU
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(cube), cube, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, cube->Size() * sizeof(GLfloat), nullptr, GL_STATIC_DRAW);
+		cube->sendData(0);
 		initTexture();
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), BUFFER_OFFSET(0));
 		glEnableVertexAttribArray(0);
@@ -166,6 +169,7 @@ GLvoid App::loop() {
 	SDL_Event ev;
 	GLboolean run = GL_TRUE;
 	while ( run) {
+		SDL_GL_SetSwapInterval(1);
 		SDL_PollEvent(&ev);
 		if (ev.type == SDL_QUIT) {
 			run = GL_FALSE;
@@ -228,4 +232,53 @@ GLboolean App::grabInput() {
 		cam->turn(CAM_ROT_PITCH, -(mY / height) * 2 * M_PI);
 	}
 	return GL_TRUE;
+}
+
+
+GLvoid App::initCube() {
+	GLfloat cubeVerts[] = { 
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+	};
+
+	cube = new Obj(cubeVerts, sizeof(cubeVerts) / sizeof(GLfloat));
 }

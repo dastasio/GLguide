@@ -29,3 +29,4 @@
 #include "textures.h"
 #include "dav_sdl.h"
 #include "camera.h"
+#include "objs.h"
