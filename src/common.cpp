@@ -84,3 +84,23 @@ GLuint InitShader() {
 	glDeleteShader(fragShader);
 	return program;
 }
+
+// creates GLfloat vector whose elements are taken
+// from the given arrays in an alternating way
+std::vector<GLfloat> toVec5(glm::vec3 v3[], glm::vec2 v2[]) {
+	if (ARRAY_SIZE(v3) / 3 != ARRAY_SIZE(v2) / 2) {
+		std::cerr << "ERROR: incorrect use of function 'toVec5'" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	GLint size = ARRAY_SIZE(v3) / 3;
+
+	std::vector<GLfloat> v5;
+	for (int i = 0; i < size; ++i) {
+		v5.push_back(v3[i].x);
+		v5.push_back(v3[i].y);
+		v5.push_back(v3[i].z);
+		v5.push_back(v2[i].x);
+		v5.push_back(v2[i].y);
+	}
+	return v5;
+}
