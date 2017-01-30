@@ -23,14 +23,17 @@ Camera::~Camera() {
  - returns: VOID
  - s.e.: updates private 'pos' vector with camera new position
 */
-GLvoid Camera::move( camEnum dir, GLfloat speed) {
+GLvoid Camera::move(camEnum dir, GLfloat speed) {
+	GLfloat tmpY = pos.y;
 	switch (dir) {
 	case CAM_MOVE_RIGHT:
 		pos += normalize(cross(N, U)) * speed;
+		pos.y = tmpY;
 		break;
 
 	case CAM_MOVE_FORWARD:
 		pos += N * speed;
+		pos.y = tmpY;
 		break;
 
 	case CAM_MOVE_UP:
@@ -40,7 +43,7 @@ GLvoid Camera::move( camEnum dir, GLfloat speed) {
 		break;
 	}
 
-	pointCamera( pos, N, U);
+	pointCamera(pos, N, U);
 }
 
 
