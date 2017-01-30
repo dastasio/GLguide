@@ -51,11 +51,16 @@ GLvoid Camera::move( camEnum dir, GLfloat speed) {
 */
 GLvoid Camera::turn(camEnum dir, GLfloat angle) {
 	GLfloat c = cosf(angle), s = sinf(angle);
+	
 	switch (dir) {
 	case CAM_ROT_YAW:
 		N = rotate(N, angle, U);
 		break;
 	case CAM_ROT_PITCH:
+		// limiting up and down rotation
+		if (N.y >= 0.8 && angle >= 0) angle = 0;
+		else if (N.y <= -0.8 && angle <= 0) angle = 0;
+		
 		N = rotate(N, angle, V);
 		break;
 	}
