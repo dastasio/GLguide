@@ -35,11 +35,13 @@ private:
 		glm::vec3(-1.3f,  1.0f, -1.5f)  
 	};
 
+	std::vector<GLuint> indices;
+
 	// matrices
 	glm::mat4 model, view, projection;
 	GLint locModel, locView, locProj;
 	// OpenGL buffers
-	GLuint VAO, VBO, gProgram;
+	GLuint VAO, VBO, EBO, gProgram;
 
 	// window settings
 	const GLfloat width = 1024, height = 720;

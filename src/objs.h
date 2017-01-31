@@ -8,12 +8,15 @@ public:
 	Obj( GLfloat* data, GLsizeiptr size);
 	~Obj();
 
-	GLsizeiptr sendData( GLuint offset);
+	GLsizeiptr sendData( GLuint dataOffset);
 
-	GLsizeiptr Size() { return count; }
+	GLsizeiptr Capacity() { return Size() * sizeof(GLfloat); }
+	GLsizeiptr Size() { return verts.size(); }
+	GLsizeiptr Count() { return verts.size() / 5; }
+	GLvoid* Offset() { return BUFFER_OFFSET(Count() * sizeof(GLfloat)); }
 private:
 	vec3 position;
-	GLsizeiptr count;
+
 
 	std::vector<GLfloat> verts;
 };

@@ -2,9 +2,9 @@
 
 using namespace glm;
 
-Camera::Camera() {
+Camera::Camera( vec3 position) {
 	camSpace = mat4(1.0);
-	pos = vec3(0.0, 0.0, 3.0);
+	pos = position;
 
 	pointCamera(pos,vec3(0.0, 0.0,-1.0), vec3( 0.0, 1.0, 0.0));
 }
