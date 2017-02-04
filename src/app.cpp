@@ -151,9 +151,7 @@ GLvoid App::render() {
 	
 	// sending matrices
 	glUniformMatrix4fv(locView, 1, GL_FALSE, value_ptr(view));
-	glUniformMatrix4fv(locProj, 1, GL_FALSE, value_ptr(projection));
-	glUniformMatrix4fv(ligView, 1, GL_FALSE, value_ptr(view));
-	glUniformMatrix4fv(ligProj, 1, GL_FALSE, value_ptr(projection));
+    glUniformMatrix4fv(locProj, 1, GL_FALSE, value_ptr(projection));
 	glUniform3f(locLightCol, 1.0, 1.0, 1.0);
 	glUniform3f(locObjCol, 1.0, 0.5, 0.31);
 
@@ -174,6 +172,10 @@ GLvoid App::render() {
 
 
 	glUseProgram(lightProgram);
+    
+    glUniformMatrix4fv(ligView, 1, GL_FALSE, value_ptr(view));
+    glUniformMatrix4fv(ligProj, 1, GL_FALSE, value_ptr(projection));
+    
 	glBindVertexArray(lightVAO);
 
 	model = translate(mat4(1.0), lightPos);
@@ -209,7 +211,8 @@ GLvoid App::loop() {
 
 GLboolean App::grabInput() {
 	SDL_SetRelativeMouseMode(SDL_TRUE);
-
+    SDL_ShowCursor(SDL_FALSE);
+    
 	GLbitfield mouseState;
 	GLint mX, mY;
 	const GLubyte* keystate = SDL_GetKeyboardState(nullptr);
