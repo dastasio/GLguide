@@ -23,6 +23,7 @@ App::App() {
 	locProj = glGetUniformLocation(gProgram, "projection");
 	locLightCol = glGetUniformLocation(gProgram, "lightColor");
 	locObjCol = glGetUniformLocation(gProgram, "objColor");
+	locViewPos = glGetUniformLocation(gProgram, "viewPos");
 
 	ligModel = glGetUniformLocation(lightProgram, "model");
 	ligView = glGetUniformLocation(lightProgram, "view");
@@ -159,6 +160,8 @@ GLvoid App::render() {
 	glUniform3f(locLightCol, 1.0, 1.0, 1.0);
 	glUniform3f(locObjCol, 1.0, 0.5, 0.31);
 	glUniform3f(ligPos, lightPos.x, lightPos.y, lightPos.z);
+	vec3 viewPos = cam->getPosition();
+	glUniform3f(locViewPos, viewPos.x, viewPos.y, viewPos.z);
 
 	
 	glBindVertexArray(VAO);
@@ -168,6 +171,7 @@ GLvoid App::render() {
 	glUniformMatrix4fv(locModel, 1, GL_FALSE, value_ptr(model));
 	glDrawElements(GL_TRIANGLES, cube->Count(), GL_UNSIGNED_INT, 0);
 	// drawing floor
+	glUniform3f(locObjCol, 0.4, 0.5, 0.31);
 	model = translate(mat4(1.0), vec3(0.0, -0.51, 0.0));
 	model = scale(model, vec3(3.0));
 	glUniformMatrix4fv(locModel, 1, GL_FALSE, value_ptr(model));

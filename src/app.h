@@ -25,7 +25,7 @@ private:
 
 	// matrices
 	glm::mat4 model, view, projection;
-	GLint locModel, locView, locProj, locLightCol, locObjCol;
+	GLint locViewPos, locModel, locView, locProj, locLightCol, locObjCol;
 	GLint ligModel, ligView, ligProj, ligPos;
 
 	// OpenGL buffers
