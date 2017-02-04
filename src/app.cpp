@@ -15,10 +15,18 @@ App::App() {
 	initWindow();
 	initBuffers();
 	initMatrices();
-
+    
+    std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
+    
 	locModel = glGetUniformLocation(gProgram, "model");
 	locView = glGetUniformLocation(gProgram, "view");
 	locProj = glGetUniformLocation(gProgram, "projection");
+	locLightCol = glGetUniformLocation(gProgram, "lightColor");
+	locObjCol = glGetUniformLocation(gProgram, "objColor");
+
+	ligModel = glGetUniformLocation(lightProgram, "model");
+	ligView = glGetUniformLocation(lightProgram, "view");
+	ligProj = glGetUniformLocation(lightProgram, "projection");
 }
 
 App::~App() {
@@ -56,7 +64,7 @@ GLvoid App::initWindow() {
 - s.e.: initializes projection matrix
 */
 GLvoid App::initProjection(GLfloat fov, GLfloat ar) {
-	projection = perspective(fov, ar, 0.1f, 100.0f);
+	projection = perspective(fov, ar, 0.1f, 500.0f);
 }
 
 
@@ -70,14 +78,16 @@ GLvoid App::initProjection(GLfloat fov, GLfloat ar) {
 */
 GLvoid App::initBuffers() {
 	// linking shaders
-	gProgram = InitShader();
+	gProgram = modelShader();
+	lightProgram = lightShader();
 	glUseProgram(gProgram);
 
 	glGenBuffers(1, &VBO);
+	glGenVertexArrays(1, &lightVAO);
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &EBO);
 
-	for (int i = 0; i < 42; ++i) {
+	for (int i = 0; i < (cube->Count() + floorModel->Count()) ; ++i) {
 		indices.push_back(i);
 	}
 	
@@ -92,12 +102,19 @@ GLvoid App::initBuffers() {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
 
-		initTexture();
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), BUFFER_OFFSET(0));
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), BUFFER_OFFSET( 3 * sizeof(GLfloat)));
-		glEnableVertexAttribArray(1);
 	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	// setting up ligth VAO
+	glBindVertexArray(lightVAO);
+		glBindBuffer( GL_ARRAY_BUFFER, VBO);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), BUFFER_OFFSET(0));
+		glEnableVertexAttribArray(0);
+	glBindVertexArray(0);
+	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -120,17 +137,6 @@ GLvoid App::initMatrices() {
 }
 
 
-/* initTexture();
- - parameters: VOID
- - returns: VOID
- - s.e.: initializes texture settings
-*/
-GLvoid App::initTexture() {
-	texSmile = loadTexture("awesomeface.jpg");
-	texCont = loadTexture("container.jpg");
-}
-
-
 /* render();
  - parameters: VOID
  - returns: VOID
@@ -140,44 +146,45 @@ GLvoid App::initTexture() {
 GLvoid App::render() {
 	glEnable(GL_DEPTH_TEST);
 
-	static mat4 ref_model = mat4(1.0);
-
 	glUseProgram(gProgram);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-	// setting textures
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texCont);
-	glUniform1i(glGetUniformLocation(gProgram, "texContainer"), 0);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, texSmile);
-	glUniform1i(glGetUniformLocation(gProgram, "texSmile"), 1);
 	
 	// sending matrices
 	glUniformMatrix4fv(locView, 1, GL_FALSE, value_ptr(view));
 	glUniformMatrix4fv(locProj, 1, GL_FALSE, value_ptr(projection));
+	glUniformMatrix4fv(ligView, 1, GL_FALSE, value_ptr(view));
+	glUniformMatrix4fv(ligProj, 1, GL_FALSE, value_ptr(projection));
+	glUniform3f(locLightCol, 1.0, 1.0, 1.0);
+	glUniform3f(locObjCol, 1.0, 0.5, 0.31);
+
 	
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	// drawing cubes
-	for (int i = 0; i < 10; ++i) {
-		model = translate(mat4(1.0), cubePositions[i]);
-		model = rotate(model, i * 0.3f, vec3(1.0, 0.3, 0.5));
-		model = model;// *ref_model;
-		glUniformMatrix4fv(locModel, 1, GL_FALSE, value_ptr(model));
-		glDrawElements(GL_TRIANGLES, cube->Count(), GL_UNSIGNED_INT, 0);
-	}
+	model = mat4(1.0);
+	glUniformMatrix4fv(locModel, 1, GL_FALSE, value_ptr(model));
+	glDrawElements(GL_TRIANGLES, cube->Count(), GL_UNSIGNED_INT, 0);
 	// drawing floor
-	model = translate(mat4(1.0), vec3(0.0, -0.5, 0.0));
+	model = translate(mat4(1.0), vec3(0.0, -0.51, 0.0));
 	model = scale(model, vec3(3.0));
 	glUniformMatrix4fv(locModel, 1, GL_FALSE, value_ptr(model));
 	glDrawElements(GL_TRIANGLES, floorModel->Count(), GL_UNSIGNED_INT, cube->Offset());
-
-
+	
 	glBindVertexArray(0);
+
+
+	glUseProgram(lightProgram);
+	glBindVertexArray(lightVAO);
+
+	model = translate(mat4(1.0), lightPos);
+	model = scale(model, vec3(0.2));
+	glUniformMatrix4fv(ligModel, 1, GL_FALSE, value_ptr(model));
+	glDrawArrays(GL_TRIANGLES, 0, cube->Count());
+	
+	glBindVertexArray(0);
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	ref_model = rotate(ref_model, radians(0.2f), vec3(0.5, 1.0, 0.0));
 	SDL_GL_SwapWindow(thisWindow);
 }
 
@@ -207,7 +214,6 @@ GLboolean App::grabInput() {
 	GLint mX, mY;
 	const GLubyte* keystate = SDL_GetKeyboardState(nullptr);
 	static GLfloat fov = radians(45.0f);
-	static GLfloat ar = 1.42f;
 
 	GLfloat speed = 0.2;
 	// reading keyboard input

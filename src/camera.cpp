@@ -53,8 +53,7 @@ GLvoid Camera::move(camEnum dir, GLfloat speed) {
  - s.e.: calls pointCamera
 */
 GLvoid Camera::turn(camEnum dir, GLfloat angle) {
-	GLfloat c = cosf(angle), s = sinf(angle);
-	
+    
 	switch (dir) {
 	case CAM_ROT_YAW:
 		N = rotate(N, angle, U);
@@ -66,6 +65,8 @@ GLvoid Camera::turn(camEnum dir, GLfloat angle) {
 		
 		N = rotate(N, angle, V);
 		break;
+    default:
+            break;
 	}
 
 	pointCamera( pos, N, U);

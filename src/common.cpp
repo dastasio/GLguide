@@ -1,10 +1,13 @@
 #include "common.h"
+using namespace std;
 
 #define VSHADER "shader.vert"
 #define FSHADER "shader.frag"
+#define VLIGHT	"light.vert"
+#define FLIGHT	"light.frag"
 
 // create GLSL program object from vertex and fragment shaders
-GLuint InitShader() {
+GLuint modelShader() {
 	// reading shader sources
 		const GLchar* vertexSource =
 		#include VSHADER
@@ -41,7 +44,7 @@ GLuint InitShader() {
 		glGetShaderiv(vertShader, GL_COMPILE_STATUS, &success);
 		if (!success) {
 			glGetShaderInfoLog(vertShader, 512, NULL, infoLog);
-			std::cout << "FAILED TO COMPILE VERTEX SHADER!\n" << infoLog << std::endl;
+			std::cout << "FAILED TO COMPILE VERTEX SHADER(1)!\n" << infoLog << std::endl;
 			exit(EXIT_FAILURE);
 		}
 
@@ -56,7 +59,7 @@ GLuint InitShader() {
 		glGetShaderiv(fragShader, GL_COMPILE_STATUS, &success);
 		if (!success) {
 			glGetShaderInfoLog(fragShader, 512, NULL, infoLog);
-			std::cout << "FAILED TO COMPILE FRAGMENT SHADER!\n" << infoLog << std::endl;
+			std::cout << "FAILED TO COMPILE FRAGMENT SHADER(1)!\n" << infoLog << std::endl;
 			exit(EXIT_FAILURE);
 		}
 	// created vertShader and fragShader objects
@@ -75,7 +78,7 @@ GLuint InitShader() {
 	glGetProgramiv(program, GL_LINK_STATUS, &success);
 	if (!success) {
 		glGetProgramInfoLog(program, 512, NULL, infoLog);
-		std::cout << "FAILED TO LINK SHADER PROGRAM:\n" << infoLog << std::endl;
+		std::cout << "FAILED TO LINK SHADER PROGRAM(1):\n" << infoLog << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -85,22 +88,55 @@ GLuint InitShader() {
 	return program;
 }
 
-// creates GLfloat vector whose elements are taken
-// from the given arrays in an alternating way
-std::vector<GLfloat> toVec5(glm::vec3 v3[], glm::vec2 v2[]) {
-	if (ARRAY_SIZE(v3) / 3 != ARRAY_SIZE(v2) / 2) {
-		std::cerr << "ERROR: incorrect use of function 'toVec5'" << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	GLint size = ARRAY_SIZE(v3) / 3;
 
-	std::vector<GLfloat> v5;
-	for (int i = 0; i < size; ++i) {
-		v5.push_back(v3[i].x);
-		v5.push_back(v3[i].y);
-		v5.push_back(v3[i].z);
-		v5.push_back(v2[i].x);
-		v5.push_back(v2[i].y);
-	}
-	return v5;
+GLuint lightShader() {
+	const GLchar* vertexSource =
+	#include VLIGHT
+		;
+	const GLchar* fragmentSource =
+	#include FLIGHT
+		;
+
+	GLchar infoLog[512];
+	GLint success;
+		GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
+		glShaderSource(vShader, 1, &vertexSource, NULL);
+
+		glCompileShader(vShader);
+		glGetShaderiv(vShader, GL_COMPILE_STATUS, &success);
+		if (!success) {
+			glGetShaderInfoLog(vShader, 512, NULL, infoLog);
+			std::cout << "ERROR: FAILED TO COMPILE VERTEX SHADER(2)!\n" << infoLog << std::endl;
+			exit(EXIT_FAILURE);
+		}
+
+
+		GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
+		glShaderSource(fShader, 1, &fragmentSource, NULL);
+		
+		glCompileShader(fShader);
+		glGetShaderiv(fShader, GL_COMPILE_STATUS, &success);
+		if (!success) {
+			glGetShaderInfoLog(fShader, 512, NULL, infoLog);
+			std::cout << "ERROR: FAILED TO COMPILE FRAGMENT SHADER(2)!\n" << infoLog << std::endl;
+			exit(EXIT_FAILURE);
+		}
+
+
+		// linking
+		GLuint p = glCreateProgram();
+		glAttachShader(p, vShader);
+		glAttachShader(p, fShader);
+		glLinkProgram(p);
+
+		glGetProgramiv(p, GL_LINK_STATUS, &success);
+		if (!success) {
+			glGetProgramInfoLog(p, 512, NULL, infoLog);
+			std::cout << "ERROR: FAILED TO LINK PROGRAM(2):\n" << infoLog << std::endl;
+			exit(EXIT_FAILURE);
+		}
+
+		glDeleteShader(vShader);
+		glDeleteShader(fShader);
+		return p;
 }

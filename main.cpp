@@ -10,8 +10,7 @@ int main(int argc, char* argv[]) {
 	App* cubeApp = new App();
 	
 	cubeApp->loop();
-
+	
 	SDL_Quit();
-
 	return 0;
 }
