@@ -12,7 +12,7 @@ public:
 
 	GLsizeiptr Capacity() { return Size() * sizeof(GLfloat); }
 	GLsizeiptr Size() { return verts.size(); }
-	GLsizeiptr Count() { return verts.size() / 5; }
+	GLsizeiptr Count() { return verts.size() / 6; }
 	GLvoid* Offset() { return BUFFER_OFFSET(Count() * sizeof(GLfloat)); }
 private:
 	vec3 position;

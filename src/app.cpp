@@ -27,6 +27,7 @@ App::App() {
 	ligModel = glGetUniformLocation(lightProgram, "model");
 	ligView = glGetUniformLocation(lightProgram, "view");
 	ligProj = glGetUniformLocation(lightProgram, "projection");
+	ligPos = glGetUniformLocation(gProgram, "lightPos");
 }
 
 App::~App() {
@@ -51,7 +52,7 @@ GLvoid App::initWindow() {
 
 	glViewport(0, 0, width, height);
 	// setting clear color
-	glClearColor(0.2, 0.45, 0.5, 1.0);
+	glClearColor(0.0, 0.15, 0.2, 1.0);
 
 	// setting depth buffer test
 	glEnable(GL_DEPTH_TEST);
@@ -102,16 +103,19 @@ GLvoid App::initBuffers() {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), BUFFER_OFFSET(0));
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), BUFFER_OFFSET(0));
 		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), BUFFER_OFFSET(3 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(1);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	
 	// setting up ligth VAO
 	glBindVertexArray(lightVAO);
 		glBindBuffer( GL_ARRAY_BUFFER, VBO);
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), BUFFER_OFFSET(0));
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), BUFFER_OFFSET(0));
 		glEnableVertexAttribArray(0);
 	glBindVertexArray(0);
 	
@@ -154,6 +158,7 @@ GLvoid App::render() {
     glUniformMatrix4fv(locProj, 1, GL_FALSE, value_ptr(projection));
 	glUniform3f(locLightCol, 1.0, 1.0, 1.0);
 	glUniform3f(locObjCol, 1.0, 0.5, 0.31);
+	glUniform3f(ligPos, lightPos.x, lightPos.y, lightPos.z);
 
 	
 	glBindVertexArray(VAO);
@@ -170,6 +175,9 @@ GLvoid App::render() {
 	
 	glBindVertexArray(0);
 
+	
+	
+	// rendering lights
 
 	glUseProgram(lightProgram);
     
@@ -184,11 +192,16 @@ GLvoid App::render() {
 	glDrawArrays(GL_TRIANGLES, 0, cube->Count());
 	
 	glBindVertexArray(0);
-
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	
+	
+	
 
 	SDL_GL_SwapWindow(thisWindow);
 }
+
+
+
 
 
 GLvoid App::loop() {
@@ -209,10 +222,13 @@ GLvoid App::loop() {
 }
 
 
+
+
+
 GLboolean App::grabInput() {
 	SDL_SetRelativeMouseMode(SDL_TRUE);
     SDL_ShowCursor(SDL_FALSE);
-    
+	
 	GLbitfield mouseState;
 	GLint mX, mY;
 	const GLubyte* keystate = SDL_GetKeyboardState(nullptr);
@@ -262,55 +278,55 @@ GLboolean App::grabInput() {
 
 GLvoid App::initCube() {
 	GLfloat cubeVerts[] = {
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0,  0.0, -1.0,
+		 0.5f, -0.5f, -0.5f,  0.0,  0.0, -1.0,
+		 0.5f,  0.5f, -0.5f,  0.0,  0.0, -1.0,
+		 0.5f,  0.5f, -0.5f,  0.0,  0.0, -1.0,
+		-0.5f,  0.5f, -0.5f,  0.0,  0.0, -1.0,
+		-0.5f, -0.5f, -0.5f,  0.0,  0.0, -1.0,
 
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0,  0.0,  1.0,
+		 0.5f, -0.5f,  0.5f,  0.0,  0.0,  1.0,
+		 0.5f,  0.5f,  0.5f,  0.0,  0.0,  1.0,
+		 0.5f,  0.5f,  0.5f,  0.0,  0.0,  1.0,
+		-0.5f,  0.5f,  0.5f,  0.0,  0.0,  1.0,
+		-0.5f, -0.5f,  0.5f,  0.0,  0.0,  1.0,
 
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f, -1.0,  0.0,  0.0,
+		-0.5f,  0.5f, -0.5f, -1.0,  0.0,  0.0,
+		-0.5f, -0.5f, -0.5f, -1.0,  0.0,  0.0,
+		-0.5f, -0.5f, -0.5f, -1.0,  0.0,  0.0,
+		-0.5f, -0.5f,  0.5f, -1.0,  0.0,  0.0,
+		-0.5f,  0.5f,  0.5f, -1.0,  0.0,  0.0,
 
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0,  0.0,  0.0,
+		 0.5f,  0.5f, -0.5f,  1.0,  0.0,  0.0,
+		 0.5f, -0.5f, -0.5f,  1.0,  0.0,  0.0,
+		 0.5f, -0.5f, -0.5f,  1.0,  0.0,  0.0,
+		 0.5f, -0.5f,  0.5f,  1.0,  0.0,  0.0,
+		 0.5f,  0.5f,  0.5f,  1.0,  0.0,  0.0,
 
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0, -1.0,  0.0,
+		 0.5f, -0.5f, -0.5f,  0.0, -1.0,  0.0,
+		 0.5f, -0.5f,  0.5f,  0.0, -1.0,  0.0,
+		 0.5f, -0.5f,  0.5f,  0.0, -1.0,  0.0,
+		-0.5f, -0.5f,  0.5f,  0.0, -1.0,  0.0,
+		-0.5f, -0.5f, -0.5f,  0.0, -1.0,  0.0,
 
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+		-0.5f,  0.5f, -0.5f,  0.0,  1.0,  0.0,
+		 0.5f,  0.5f, -0.5f,  0.0,  1.0,  0.0,
+		 0.5f,  0.5f,  0.5f,  0.0,  1.0,  0.0,
+		 0.5f,  0.5f,  0.5f,  0.0,  1.0,  0.0,
+		-0.5f,  0.5f,  0.5f,  0.0,  1.0,  0.0,
+		-0.5f,  0.5f, -0.5f,  0.0,  1.0,  0.0
 	};
 	GLfloat floorVerts[] = {
-		-10.0, 0.0,  10.0,	0.0, 0.0,
-		 10.0, 0.0,  10.0,  1.0, 0.0,
-		 10.0, 0.0, -10.0,  1.0, 1.0,
-		 10.0, 0.0, -10.0,  1.0, 1.0,
-		-10.0, 0.0, -10.0,  0.0, 1.0,
-		-10.0, 0.0,  10.0,  0.0, 0.0
+		-10.0, 0.0,  10.0,	0.0,  1.0,  0.0,
+		 10.0, 0.0,  10.0,  0.0,  1.0,  0.0,
+		 10.0, 0.0, -10.0,  0.0,  1.0,  0.0,
+		 10.0, 0.0, -10.0,  0.0,  1.0,  0.0,
+		-10.0, 0.0, -10.0,  0.0,  1.0,  0.0,
+		-10.0, 0.0,  10.0,  0.0,  1.0,  0.0
 	};
 
 	cube = new Obj(cubeVerts, sizeof(cubeVerts) / sizeof(GLfloat));
