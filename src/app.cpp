@@ -29,6 +29,16 @@ App::App() {
 	ligView = glGetUniformLocation(lightProgram, "view");
 	ligProj = glGetUniformLocation(lightProgram, "projection");
 	ligPos = glGetUniformLocation(gProgram, "lightPos");
+	
+	matAmbLoc = glGetUniformLocation(gProgram, "mater.ambient");
+	matDiffLoc = glGetUniformLocation(gProgram, "mater.diffuse");
+	matSpecLoc = glGetUniformLocation(gProgram, "mater.specular");
+	matShineLoc = glGetUniformLocation(gProgram, "mater.shineFactor");
+	
+	lightPosLoc = glGetUniformLocation(gProgram, "light.position");
+	lightAmbLoc = glGetUniformLocation(gProgram, "light.ambient");
+	lightDiffLoc = glGetUniformLocation(gProgram, "light.diffuse");
+	lightSpecLoc = glGetUniformLocation(gProgram, "light.specular");
 }
 
 App::~App() {
@@ -159,10 +169,19 @@ GLvoid App::render() {
     glUniformMatrix4fv(locProj, 1, GL_FALSE, value_ptr(projection));
 	glUniform3f(locLightCol, 1.0, 1.0, 1.0);
 	glUniform3f(locObjCol, 1.0, 0.5, 0.31);
-	glUniform3f(ligPos, lightPos.x, lightPos.y, lightPos.z);
 	vec3 viewPos = cam->getPosition();
 	glUniform3f(locViewPos, viewPos.x, viewPos.y, viewPos.z);
-
+	
+	glUniform3f(matAmbLoc, 0.0, 0.05, 0.05);
+	glUniform3f(matDiffLoc, 0.4, 0.5, 0.5);
+	glUniform3f(matSpecLoc, 0.04, 0.7, 0.7);
+	glUniform1f(matShineLoc, 0.078125 * 128);
+	
+	glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
+	glUniform3f(lightAmbLoc, 1, 1, 1);
+	glUniform3f(lightDiffLoc, 1, 1, 1);
+	glUniform3f(lightSpecLoc, 1.0, 1.0, 1.0);
+	
 	
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);

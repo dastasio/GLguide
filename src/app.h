@@ -27,6 +27,8 @@ private:
 	glm::mat4 model, view, projection;
 	GLint locViewPos, locModel, locView, locProj, locLightCol, locObjCol;
 	GLint ligModel, ligView, ligProj, ligPos;
+	GLint matAmbLoc, matDiffLoc, matSpecLoc, matShineLoc;
+	GLint lightPosLoc, lightAmbLoc, lightDiffLoc, lightSpecLoc;
 
 	// OpenGL buffers
 	GLuint VAO, VBO, EBO, lightVAO, gProgram, lightProgram;
