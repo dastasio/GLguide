@@ -16,11 +16,12 @@ public:
 
 	GLboolean grabInput();
 	GLvoid loop();
+	
 private:
 	GLvoid render();
 
+	
 	std::vector<GLfloat> models;
-
 	std::vector<GLuint> indices;
 
 	// matrices

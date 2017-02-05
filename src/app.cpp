@@ -149,6 +149,10 @@ GLvoid App::initMatrices() {
 		sends uniform variables to GLSL
 */
 GLvoid App::render() {
+	static GLfloat angle = 0.0;
+	lightPos = 2.0f * vec3( cosf(angle), 0.7, sinf(angle));
+	
+	
 	glEnable(GL_DEPTH_TEST);
 
 	glUseProgram(gProgram);
@@ -200,6 +204,7 @@ GLvoid App::render() {
 	
 	
 	
+	angle += M_PI/200;
 
 	SDL_GL_SwapWindow(thisWindow);
 }
