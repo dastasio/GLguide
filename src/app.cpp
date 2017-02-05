@@ -11,8 +11,9 @@ App::App() {
 	view = cam->getMatrix();
 	projection = mat4(1.0);
 
-	initCube();
+
 	initWindow();
+	initCube();
 	initBuffers();
 	initMatrices();
     
@@ -30,7 +31,6 @@ App::App() {
 	ligProj = glGetUniformLocation(lightProgram, "projection");
 	ligPos = glGetUniformLocation(gProgram, "lightPos");
 	
-	matAmbLoc = glGetUniformLocation(gProgram, "mater.ambient");
 	matDiffLoc = glGetUniformLocation(gProgram, "mater.diffuse");
 	matSpecLoc = glGetUniformLocation(gProgram, "mater.specular");
 	matShineLoc = glGetUniformLocation(gProgram, "mater.shineFactor");
@@ -104,7 +104,8 @@ GLvoid App::initBuffers() {
 	}
 	
 	// VAO setup
-	glBindVertexArray(VAO);
+	{
+		glBindVertexArray(VAO);
 		// sending cube data to GPU
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferData(GL_ARRAY_BUFFER, cube->Capacity() + floorModel->Capacity(), nullptr, GL_STATIC_DRAW);
@@ -114,23 +115,26 @@ GLvoid App::initBuffers() {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), BUFFER_OFFSET(0));
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), BUFFER_OFFSET(0));
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), BUFFER_OFFSET(3 * sizeof(GLfloat)));
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), BUFFER_OFFSET(3 * sizeof(GLfloat)));
 		glEnableVertexAttribArray(1);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), BUFFER_OFFSET(6 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(2);
+		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
 	
 	// setting up ligth VAO
-	glBindVertexArray(lightVAO);
+	{
+		glBindVertexArray(lightVAO);
 		glBindBuffer( GL_ARRAY_BUFFER, VBO);
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), BUFFER_OFFSET(0));
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), BUFFER_OFFSET(0));
 		glEnableVertexAttribArray(0);
-	glBindVertexArray(0);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
 }
 
 
@@ -165,57 +169,66 @@ GLvoid App::render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	// sending matrices
-	glUniformMatrix4fv(locView, 1, GL_FALSE, value_ptr(view));
-    glUniformMatrix4fv(locProj, 1, GL_FALSE, value_ptr(projection));
-	glUniform3f(locLightCol, 1.0, 1.0, 1.0);
-	glUniform3f(locObjCol, 1.0, 0.5, 0.31);
-	vec3 viewPos = cam->getPosition();
-	glUniform3f(locViewPos, viewPos.x, viewPos.y, viewPos.z);
+	{
+		glUniformMatrix4fv(locView, 1, GL_FALSE, value_ptr(view));
+		glUniformMatrix4fv(locProj, 1, GL_FALSE, value_ptr(projection));
+		glUniform3f(locLightCol, 1.0, 1.0, 1.0);
+		glUniform3f(locObjCol, 1.0, 0.5, 0.31);
+		vec3 viewPos = cam->getPosition();
+		glUniform3f(locViewPos, viewPos.x, viewPos.y, viewPos.z);
+		
+		glUniform1i(matDiffLoc, 0);
+		glUniform1i(matSpecLoc, 1);
+		glUniform1f(matShineLoc, 256);
+		
+		glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
+		glUniform3f(lightAmbLoc, 0.3, 0.3, 0.3);
+		glUniform3f(lightDiffLoc, 0.5, 0.5, 0.5);
+		glUniform3f(lightSpecLoc, 1.0, 1.0, 1.0);
+	}
 	
-	glUniform3f(matAmbLoc, 0.0, 0.05, 0.05);
-	glUniform3f(matDiffLoc, 0.4, 0.5, 0.5);
-	glUniform3f(matSpecLoc, 0.04, 0.7, 0.7);
-	glUniform1f(matShineLoc, 0.078125 * 128);
-	
-	glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
-	glUniform3f(lightAmbLoc, 1, 1, 1);
-	glUniform3f(lightDiffLoc, 1, 1, 1);
-	glUniform3f(lightSpecLoc, 1.0, 1.0, 1.0);
-	
-	
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	// drawing cubes
-	model = mat4(1.0);
-	glUniformMatrix4fv(locModel, 1, GL_FALSE, value_ptr(model));
-	glDrawElements(GL_TRIANGLES, cube->Count(), GL_UNSIGNED_INT, 0);
-	// drawing floor
-	glUniform3f(locObjCol, 0.4, 0.5, 0.31);
-	model = translate(mat4(1.0), vec3(0.0, -0.51, 0.0));
-	model = scale(model, vec3(3.0));
-	glUniformMatrix4fv(locModel, 1, GL_FALSE, value_ptr(model));
-	glDrawElements(GL_TRIANGLES, floorModel->Count(), GL_UNSIGNED_INT, cube->Offset());
-	
-	glBindVertexArray(0);
+	// rendering scene
+	{
+		glBindVertexArray(VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		// setting textures
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, diffuseTexture);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, specTexture);
+		
+		// drawing cubes
+		model = mat4(1.0);
+		glUniformMatrix4fv(locModel, 1, GL_FALSE, value_ptr(model));
+		glDrawElements(GL_TRIANGLES, cube->Count(), GL_UNSIGNED_INT, 0);
+		// drawing floor
+		glUniform3f(locObjCol, 0.4, 0.5, 0.31);
+		model = translate(mat4(1.0), vec3(0.0, -0.51, 0.0));
+		model = scale(model, vec3(3.0));
+		glUniformMatrix4fv(locModel, 1, GL_FALSE, value_ptr(model));
+		glDrawElements(GL_TRIANGLES, floorModel->Count(), GL_UNSIGNED_INT, cube->Offset());
+		
+		glBindVertexArray(0);
+	}
 
-	
 	
 	// rendering lights
-
-	glUseProgram(lightProgram);
-    
-    glUniformMatrix4fv(ligView, 1, GL_FALSE, value_ptr(view));
-    glUniformMatrix4fv(ligProj, 1, GL_FALSE, value_ptr(projection));
-    
-	glBindVertexArray(lightVAO);
-
-	model = translate(mat4(1.0), lightPos);
-	model = scale(model, vec3(0.2));
-	glUniformMatrix4fv(ligModel, 1, GL_FALSE, value_ptr(model));
-	glDrawArrays(GL_TRIANGLES, 0, cube->Count());
-	
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	{
+		glUseProgram(lightProgram);
+		
+		glUniformMatrix4fv(ligView, 1, GL_FALSE, value_ptr(view));
+		glUniformMatrix4fv(ligProj, 1, GL_FALSE, value_ptr(projection));
+		
+		glBindVertexArray(lightVAO);
+		
+		model = translate(mat4(1.0), lightPos);
+		model = scale(model, vec3(0.2));
+		glUniformMatrix4fv(ligModel, 1, GL_FALSE, value_ptr(model));
+		glDrawArrays(GL_TRIANGLES, 0, cube->Count());
+		
+		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
 	
 	
 	
@@ -301,57 +314,74 @@ GLboolean App::grabInput() {
 
 GLvoid App::initCube() {
 	GLfloat cubeVerts[] = {
-		-0.5f, -0.5f, -0.5f,  0.0,  0.0, -1.0,
-		 0.5f, -0.5f, -0.5f,  0.0,  0.0, -1.0,
-		 0.5f,  0.5f, -0.5f,  0.0,  0.0, -1.0,
-		 0.5f,  0.5f, -0.5f,  0.0,  0.0, -1.0,
-		-0.5f,  0.5f, -0.5f,  0.0,  0.0, -1.0,
-		-0.5f, -0.5f, -0.5f,  0.0,  0.0, -1.0,
+		// positions		/ Normals		/ Texture Coordinates
+		-0.5f, -0.5f, -0.5f,  0.0,  0.0, -1.0,  0.0, 0.0,
+		 0.5f, -0.5f, -0.5f,  0.0,  0.0, -1.0,  1.0, 0.0,
+		 0.5f,  0.5f, -0.5f,  0.0,  0.0, -1.0,  1.0, 1.0,
+		 0.5f,  0.5f, -0.5f,  0.0,  0.0, -1.0,  1.0, 1.0,
+		-0.5f,  0.5f, -0.5f,  0.0,  0.0, -1.0,  0.0, 1.0,
+		-0.5f, -0.5f, -0.5f,  0.0,  0.0, -1.0,  0.0, 0.0,
 
-		-0.5f, -0.5f,  0.5f,  0.0,  0.0,  1.0,
-		 0.5f, -0.5f,  0.5f,  0.0,  0.0,  1.0,
-		 0.5f,  0.5f,  0.5f,  0.0,  0.0,  1.0,
-		 0.5f,  0.5f,  0.5f,  0.0,  0.0,  1.0,
-		-0.5f,  0.5f,  0.5f,  0.0,  0.0,  1.0,
-		-0.5f, -0.5f,  0.5f,  0.0,  0.0,  1.0,
+		-0.5f, -0.5f,  0.5f,  0.0,  0.0,  1.0,  0.0, 0.0,
+		 0.5f, -0.5f,  0.5f,  0.0,  0.0,  1.0,  1.0, 0.0,
+		 0.5f,  0.5f,  0.5f,  0.0,  0.0,  1.0,  1.0, 1.0,
+		 0.5f,  0.5f,  0.5f,  0.0,  0.0,  1.0,  1.0, 1.0,
+		-0.5f,  0.5f,  0.5f,  0.0,  0.0,  1.0,  0.0, 1.0,
+		-0.5f, -0.5f,  0.5f,  0.0,  0.0,  1.0,  0.0, 0.0,
 
-		-0.5f,  0.5f,  0.5f, -1.0,  0.0,  0.0,
-		-0.5f,  0.5f, -0.5f, -1.0,  0.0,  0.0,
-		-0.5f, -0.5f, -0.5f, -1.0,  0.0,  0.0,
-		-0.5f, -0.5f, -0.5f, -1.0,  0.0,  0.0,
-		-0.5f, -0.5f,  0.5f, -1.0,  0.0,  0.0,
-		-0.5f,  0.5f,  0.5f, -1.0,  0.0,  0.0,
+		-0.5f,  0.5f,  0.5f, -1.0,  0.0,  0.0,  1.0, 0.0,
+		-0.5f,  0.5f, -0.5f, -1.0,  0.0,  0.0,  1.0, 1.0,
+		-0.5f, -0.5f, -0.5f, -1.0,  0.0,  0.0,  0.0, 1.0,
+		-0.5f, -0.5f, -0.5f, -1.0,  0.0,  0.0,  0.0, 1.0,
+		-0.5f, -0.5f,  0.5f, -1.0,  0.0,  0.0,  0.0, 0.0,
+		-0.5f,  0.5f,  0.5f, -1.0,  0.0,  0.0,  1.0, 0.0,
 
-		 0.5f,  0.5f,  0.5f,  1.0,  0.0,  0.0,
-		 0.5f,  0.5f, -0.5f,  1.0,  0.0,  0.0,
-		 0.5f, -0.5f, -0.5f,  1.0,  0.0,  0.0,
-		 0.5f, -0.5f, -0.5f,  1.0,  0.0,  0.0,
-		 0.5f, -0.5f,  0.5f,  1.0,  0.0,  0.0,
-		 0.5f,  0.5f,  0.5f,  1.0,  0.0,  0.0,
+		 0.5f,  0.5f,  0.5f,  1.0,  0.0,  0.0,  1.0, 0.0,
+		 0.5f,  0.5f, -0.5f,  1.0,  0.0,  0.0,  1.0, 1.0,
+		 0.5f, -0.5f, -0.5f,  1.0,  0.0,  0.0,  0.0, 1.0,
+		 0.5f, -0.5f, -0.5f,  1.0,  0.0,  0.0,  0.0, 1.0,
+		 0.5f, -0.5f,  0.5f,  1.0,  0.0,  0.0,  0.0, 0.0,
+		 0.5f,  0.5f,  0.5f,  1.0,  0.0,  0.0,  1.0, 0.0,
 
-		-0.5f, -0.5f, -0.5f,  0.0, -1.0,  0.0,
-		 0.5f, -0.5f, -0.5f,  0.0, -1.0,  0.0,
-		 0.5f, -0.5f,  0.5f,  0.0, -1.0,  0.0,
-		 0.5f, -0.5f,  0.5f,  0.0, -1.0,  0.0,
-		-0.5f, -0.5f,  0.5f,  0.0, -1.0,  0.0,
-		-0.5f, -0.5f, -0.5f,  0.0, -1.0,  0.0,
+		-0.5f, -0.5f, -0.5f,  0.0, -1.0,  0.0,  0.0, 1.0,
+		 0.5f, -0.5f, -0.5f,  0.0, -1.0,  0.0,  1.0, 1.0,
+		 0.5f, -0.5f,  0.5f,  0.0, -1.0,  0.0,  1.0, 0.0,
+		 0.5f, -0.5f,  0.5f,  0.0, -1.0,  0.0,  1.0, 0.0,
+		-0.5f, -0.5f,  0.5f,  0.0, -1.0,  0.0,  0.0, 0.0,
+		-0.5f, -0.5f, -0.5f,  0.0, -1.0,  0.0,  0.0, 1.0,
 
-		-0.5f,  0.5f, -0.5f,  0.0,  1.0,  0.0,
-		 0.5f,  0.5f, -0.5f,  0.0,  1.0,  0.0,
-		 0.5f,  0.5f,  0.5f,  0.0,  1.0,  0.0,
-		 0.5f,  0.5f,  0.5f,  0.0,  1.0,  0.0,
-		-0.5f,  0.5f,  0.5f,  0.0,  1.0,  0.0,
-		-0.5f,  0.5f, -0.5f,  0.0,  1.0,  0.0
+		-0.5f,  0.5f, -0.5f,  0.0,  1.0,  0.0,  0.0, 1.0,
+		 0.5f,  0.5f, -0.5f,  0.0,  1.0,  0.0,  1.0, 1.0,
+		 0.5f,  0.5f,  0.5f,  0.0,  1.0,  0.0,  1.0, 0.0,
+		 0.5f,  0.5f,  0.5f,  0.0,  1.0,  0.0,  1.0, 0.0,
+		-0.5f,  0.5f,  0.5f,  0.0,  1.0,  0.0,  0.0, 0.0,
+		-0.5f,  0.5f, -0.5f,  0.0,  1.0,  0.0,  0.0, 1.0
 	};
 	GLfloat floorVerts[] = {
-		-10.0, 0.0,  10.0,	0.0,  1.0,  0.0,
-		 10.0, 0.0,  10.0,  0.0,  1.0,  0.0,
-		 10.0, 0.0, -10.0,  0.0,  1.0,  0.0,
-		 10.0, 0.0, -10.0,  0.0,  1.0,  0.0,
-		-10.0, 0.0, -10.0,  0.0,  1.0,  0.0,
-		-10.0, 0.0,  10.0,  0.0,  1.0,  0.0
+		// positions		/ Normals		/ Texture Coordinates
+		-10.0, 0.0,  10.0,	0.0,  1.0,  0.0,  0.0, 0.0,
+		 10.0, 0.0,  10.0,  0.0,  1.0,  0.0,  1.0, 0.0,
+		 10.0, 0.0, -10.0,  0.0,  1.0,  0.0,  1.0, 1.0,
+		 10.0, 0.0, -10.0,  0.0,  1.0,  0.0,  1.0, 1.0,
+		-10.0, 0.0, -10.0,  0.0,  1.0,  0.0,  0.0, 1.0,
+		-10.0, 0.0,  10.0,  0.0,  1.0,  0.0,  0.0, 0.0
 	};
 
 	cube = new Obj(cubeVerts, sizeof(cubeVerts) / sizeof(GLfloat));
 	floorModel = new Obj(floorVerts, sizeof(floorVerts) / sizeof(GLfloat));
+	
+	diffuseTexture = loadTexture("container2.png");
+	specTexture = loadTexture("container2_specular.png");
 }
+
+
+
+
+
+
+
+
+
+
+
+
