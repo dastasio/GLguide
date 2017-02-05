@@ -3,17 +3,17 @@ R"SHADER(
 
 in vec3 normal;
 in vec3 fragPos;
+in vec3 ligPos;
 out vec4 final_color;
 
 uniform vec3 lightColor;
-uniform vec3 lightPos;
 uniform vec3 objColor;
 uniform vec3 viewPos;
 
 void main() {
 
 	vec3 norm = normalize(normal);
-	vec3 lDir = normalize( lightPos - fragPos);
+	vec3 lDir = normalize( ligPos - fragPos);
 	float diffuse = max( dot( norm, lDir), 0.0);
 	vec3 diff = diffuse * lightColor;
 
@@ -21,7 +21,7 @@ void main() {
 	vec3 amb = strengthAmbient * lightColor;
 
 	float specStrength = 0.5;
-	vec3 vDir = normalize( viewPos - fragPos);
+	vec3 vDir = normalize( vec3(0.0) - fragPos);
 	vec3 refDir = reflect( -lDir, norm);
 	float spec = pow(max(dot(vDir, refDir), 0.0), 32);
 	vec3 sp = specStrength * spec * lightColor;
