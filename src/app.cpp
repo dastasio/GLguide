@@ -35,7 +35,7 @@ App::App() {
 	matSpecLoc = glGetUniformLocation(gProgram, "mater.specular");
 	matShineLoc = glGetUniformLocation(gProgram, "mater.shineFactor");
 	
-	lightPosLoc = glGetUniformLocation(gProgram, "light.position");
+	lightDirLoc = glGetUniformLocation(gProgram, "light.direction");
 	lightAmbLoc = glGetUniformLocation(gProgram, "light.ambient");
 	lightDiffLoc = glGetUniformLocation(gProgram, "light.diffuse");
 	lightSpecLoc = glGetUniformLocation(gProgram, "light.specular");
@@ -179,12 +179,12 @@ GLvoid App::render() {
 		
 		glUniform1i(matDiffLoc, 0);
 		glUniform1i(matSpecLoc, 1);
-		glUniform1f(matShineLoc, 256);
+		glUniform1f(matShineLoc, 128);
 		
-		glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
-		glUniform3f(lightAmbLoc, 0.3, 0.3, 0.3);
-		glUniform3f(lightDiffLoc, 0.5, 0.5, 0.5);
-		glUniform3f(lightSpecLoc, 1.0, 1.0, 1.0);
+		glUniform3f(lightDirLoc, -0.2, -1.0, -0.3);
+		glUniform3f(lightAmbLoc , 0.2, 0.2, 0.13);
+		glUniform3f(lightDiffLoc, 0.8, 0.8, 0.7);
+		glUniform3f(lightSpecLoc, 1.0, 1.0, 0.9);
 	}
 	
 	// rendering scene
@@ -198,15 +198,20 @@ GLvoid App::render() {
 		glBindTexture(GL_TEXTURE_2D, specTexture);
 		
 		// drawing cubes
-		model = mat4(1.0);
-		glUniformMatrix4fv(locModel, 1, GL_FALSE, value_ptr(model));
-		glDrawElements(GL_TRIANGLES, cube->Count(), GL_UNSIGNED_INT, 0);
+		{
+			for( int i = 0; i < 10; ++i) {
+				model = translate(mat4(1.0), cubePositions[i]);
+				model = rotate(model, GLfloat(i * M_PI/7), vec3(0.5, 1.0, 0.3));
+				glUniformMatrix4fv(locModel, 1, GL_FALSE, value_ptr(model));
+				glDrawElements(GL_TRIANGLES, cube->Count(), GL_UNSIGNED_INT, 0);
+			}
+		}
 		// drawing floor
-		glUniform3f(locObjCol, 0.4, 0.5, 0.31);
-		model = translate(mat4(1.0), vec3(0.0, -0.51, 0.0));
-		model = scale(model, vec3(3.0));
-		glUniformMatrix4fv(locModel, 1, GL_FALSE, value_ptr(model));
-		glDrawElements(GL_TRIANGLES, floorModel->Count(), GL_UNSIGNED_INT, cube->Offset());
+//		glUniform3f(locObjCol, 0.4, 0.5, 0.31);
+//		model = translate(mat4(1.0), vec3(0.0, -0.51, 0.0));
+//		model = scale(model, vec3(3.0));
+//		glUniformMatrix4fv(locModel, 1, GL_FALSE, value_ptr(model));
+//		glDrawElements(GL_TRIANGLES, floorModel->Count(), GL_UNSIGNED_INT, cube->Offset());
 		
 		glBindVertexArray(0);
 	}
