@@ -21,6 +21,7 @@ public:
 
 	glm::mat4 getMatrix() { return camSpace; }
 	glm::vec3 getPosition() { return pos; }
+	glm::vec3 getTarget() { return N; }
 private:
 
 	glm::vec3 pos;
