@@ -28,7 +28,7 @@ private:
 	GLint locViewPos, locModel, locView, locProj, locLightCol, locObjCol;
 	GLint ligModel, ligView, ligProj, ligPos;
 	GLint matDiffLoc, matSpecLoc, matShineLoc;
-	GLint lightPosLoc, lightAmbLoc, lightDiffLoc, lightSpecLoc, lightDirLoc, lightCutLoc;
+	GLint lightPosLoc, lightAmbLoc, lightDiffLoc, lightSpecLoc, lightDirLoc, lightCutLoc, lightOutCutLoc, lightLinLoc, lightConstLoc, lightQuadLoc;
 
 	// OpenGL buffers
 	GLuint VAO, VBO, EBO, lightVAO, gProgram, lightProgram, diffuseTexture, specTexture;

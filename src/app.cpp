@@ -41,6 +41,10 @@ App::App() {
 	lightDiffLoc = glGetUniformLocation(gProgram, "light.diffuse");
 	lightSpecLoc = glGetUniformLocation(gProgram, "light.specular");
 	lightCutLoc = glGetUniformLocation(gProgram, "light.cutOff");
+	lightOutCutLoc = glGetUniformLocation(gProgram, "light.outCutOff");
+	lightConstLoc = glGetUniformLocation(gProgram, "light.constant");
+	lightLinLoc = glGetUniformLocation(gProgram, "light.linear");
+	lightQuadLoc = glGetUniformLocation(gProgram, "light.quadratic");
 	
 }
 
@@ -191,6 +195,10 @@ GLvoid App::render() {
 		glUniform3f(lightDiffLoc, 0.8, 0.8, 0.7);
 		glUniform3f(lightSpecLoc, 1.0, 1.0, 0.9);
 		glUniform1f(lightCutLoc, cosf(radians(12.5)));
+		glUniform1f(lightOutCutLoc, cosf(radians(17.5)));
+		glUniform1f(lightConstLoc, 1.0);
+		glUniform1f(lightLinLoc, 0.09);
+		glUniform1f(lightQuadLoc, 0.032);
 	}
 	
 	// rendering scene
