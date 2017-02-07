@@ -1,4 +1,5 @@
 #include "app.h"
+#include <sstream>
 
 using namespace glm;
 
@@ -22,8 +23,6 @@ App::App() {
 	locModel = glGetUniformLocation(gProgram, "model");
 	locView = glGetUniformLocation(gProgram, "view");
 	locProj = glGetUniformLocation(gProgram, "projection");
-	locLightCol = glGetUniformLocation(gProgram, "lightColor");
-	locObjCol = glGetUniformLocation(gProgram, "objColor");
 	locViewPos = glGetUniformLocation(gProgram, "viewPos");
 
 	ligModel = glGetUniformLocation(lightProgram, "model");
@@ -35,16 +34,59 @@ App::App() {
 	matSpecLoc = glGetUniformLocation(gProgram, "mater.specular");
 	matShineLoc = glGetUniformLocation(gProgram, "mater.shineFactor");
 	
-	lightPosLoc = glGetUniformLocation(gProgram, "light.position");
-	lightDirLoc = glGetUniformLocation(gProgram, "light.direction");
-	lightAmbLoc = glGetUniformLocation(gProgram, "light.ambient");
-	lightDiffLoc = glGetUniformLocation(gProgram, "light.diffuse");
-	lightSpecLoc = glGetUniformLocation(gProgram, "light.specular");
-	lightCutLoc = glGetUniformLocation(gProgram, "light.cutOff");
-	lightOutCutLoc = glGetUniformLocation(gProgram, "light.outCutOff");
-	lightConstLoc = glGetUniformLocation(gProgram, "light.constant");
-	lightLinLoc = glGetUniformLocation(gProgram, "light.linear");
-	lightQuadLoc = glGetUniformLocation(gProgram, "light.quadratic");
+	dirDirLoc = glGetUniformLocation(gProgram, "dirL.direction");
+	dirAmbLoc = glGetUniformLocation(gProgram, "dirL.amb");
+	dirDiffLoc = glGetUniformLocation(gProgram, "dirL.diff");
+	dirSpecLoc = glGetUniformLocation(gProgram, "dirL.spec");
+	
+	for( long i = 0; i < 4; ++i) {
+		std::string name = "pointL[";
+		std::ostringstream conv;
+		conv << i;
+		
+		name.append(conv.str());
+		name.append("].position");
+		pntPosLoc[i] = glGetUniformLocation(gProgram, name.c_str());
+		
+		name.clear();
+		name = "pointL[";
+		name.append(conv.str());
+		name.append("].constant");
+		pntConstLoc[i] = glGetUniformLocation(gProgram, name.c_str());
+		
+		name.clear();
+		name = "pointL[";
+		name.append(conv.str());
+		name.append("].linear");
+		pntLinLoc[i] = glGetUniformLocation(gProgram, name.c_str());
+		
+		name.clear();
+		name = "pointL[";
+		name.append(conv.str());
+		name.append("].quadratic");
+		pntQuadLoc[i] = glGetUniformLocation(gProgram, name.c_str());
+		
+		name.clear();
+		name = "pointL[";
+		name.append(conv.str());
+		name.append("].amb");
+		pntAmbLoc[i] = glGetUniformLocation(gProgram, name.c_str());
+		
+		name.clear();
+		name = "pointL[";
+		name.append(conv.str());
+		name.append("].diff");
+		pntDiffLoc[i] = glGetUniformLocation(gProgram, name.c_str());
+		
+		name.clear();
+		name = "pointL[";
+		name.append(conv.str());
+		name.append("].spec");
+		pntSpecLoc[i] = glGetUniformLocation(gProgram, name.c_str());
+		
+		
+		std::cout << name.c_str() << std::endl;
+	}
 	
 }
 
@@ -70,7 +112,7 @@ GLvoid App::initWindow() {
 
 	glViewport(0, 0, width, height);
 	// setting clear color
-	glClearColor(0.0, 0.15, 0.2, 1.0);
+	glClearColor(0.1, 0.1, 0.1, 1.0);
 
 	// setting depth buffer test
 	glEnable(GL_DEPTH_TEST);
@@ -179,26 +221,29 @@ GLvoid App::render() {
 	{
 		glUniformMatrix4fv(locView, 1, GL_FALSE, value_ptr(view));
 		glUniformMatrix4fv(locProj, 1, GL_FALSE, value_ptr(projection));
-		glUniform3f(locLightCol, 1.0, 1.0, 1.0);
-		glUniform3f(locObjCol, 1.0, 0.5, 0.31);
 		vec3 viewPos = cam->getPosition();
 		glUniform3f(locViewPos, viewPos.x, viewPos.y, viewPos.z);
 		
 		glUniform1i(matDiffLoc, 0);
 		glUniform1i(matSpecLoc, 1);
-		glUniform1f(matShineLoc, 128);
+		glUniform1f(matShineLoc, 512);
 		
 		
-		glUniform3f(lightPosLoc, cam->getPosition().x, cam->getPosition().y, cam->getPosition().z);
-		glUniform3f(lightDirLoc, cam->getTarget().x, cam->getTarget().y, cam->getTarget().z);
-		glUniform3f(lightAmbLoc , 0.2, 0.2, 0.13);
-		glUniform3f(lightDiffLoc, 0.8, 0.8, 0.7);
-		glUniform3f(lightSpecLoc, 1.0, 1.0, 0.9);
-		glUniform1f(lightCutLoc, cosf(radians(12.5)));
-		glUniform1f(lightOutCutLoc, cosf(radians(17.5)));
-		glUniform1f(lightConstLoc, 1.0);
-		glUniform1f(lightLinLoc, 0.09);
-		glUniform1f(lightQuadLoc, 0.032);
+		glUniform3f(dirDirLoc, 0.0, 2.0, 3.0);
+		glUniform3f(dirAmbLoc, 0.05, 0.05, 0.02);
+		glUniform3f(dirDiffLoc, 0.4, 0.4, 0.25);
+		glUniform3f(dirSpecLoc, 0.5, 0.5, 0.4);
+		
+		for( int i = 0; i < 4; ++i) {
+			glUniform3f(pntPosLoc[i], pointLightPositions[i].x, pointLightPositions[i].y, pointLightPositions[i].z);
+			glUniform1f(pntConstLoc[i], 1.0);
+			glUniform1f(pntLinLoc[i], 0.09);
+			glUniform1f(pntQuadLoc[i], 0.032);
+			glUniform3f(pntAmbLoc[i], 0.05, 0.05, 0.05);
+			glUniform3f(pntDiffLoc[i], 0.9, 0.7, 0.9);
+			glUniform3f(pntSpecLoc[i], 1.0, 0.8, 1.0);
+		}
+		
 	}
 	
 	// rendering scene
@@ -240,10 +285,12 @@ GLvoid App::render() {
 		
 		glBindVertexArray(lightVAO);
 		
-		model = translate(mat4(1.0), lightPos);
-		model = scale(model, vec3(0.2));
-		glUniformMatrix4fv(ligModel, 1, GL_FALSE, value_ptr(model));
-		glDrawArrays(GL_TRIANGLES, 0, cube->Count());
+		for( int i = 0; i < 4; ++i) {
+			model = translate(mat4(1.0), pointLightPositions[i]);
+			model = scale(model, vec3(0.2));
+			glUniformMatrix4fv(ligModel, 1, GL_FALSE, value_ptr(model));
+			glDrawArrays(GL_TRIANGLES, 0, cube->Count());
+		}
 		
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -300,6 +347,9 @@ GLboolean App::grabInput() {
 		fov -= 0.05;
 		if (fov <= 0.1) fov = 0.1;
 		initProjection(fov);
+	}
+	if (keystate[SDL_SCANCODE_RSHIFT]) {
+		speed = 0.05;
 	}
 	if (keystate[SDL_SCANCODE_ESCAPE]) {
 		return GL_FALSE;
