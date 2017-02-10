@@ -21,21 +21,26 @@ else()
 	set( SYSUNIX 1)
 	message( "detected Unix system")
 endif()
-find_package( OpenGL REQUIRED)
+find_package( OPENGL REQUIRED)
+message("" ${OPENGL_INCLUDE_DIR})
 
 # building glm variables
 set( GLM_STATIC_LIBRARY_ENABLE ON CACHE BOOL "" FORCE)
+set( ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set( BUILD_ASSIMP_SAMPLES OFF CACHE BOOL "" FORCE)
 
 add_executable( ${EXEC_NAME} "main.cpp")
 add_subdirectory( ${SOURCE_LIB}) # adding my library
 add_subdirectory( ${PROJECT_SOURCE_DIR}/glm) # adding glm library
+add_subdirectory( ${PROJECT_SOURCE_DIR}/assimp) # assimp library
 
 
 # setting c++ version
 target_compile_features( ${EXEC_NAME} PRIVATE cxx_nullptr)
 
-target_link_libraries( ${EXEC_NAME} my_lib ${OPENGL_LIBRARIES} glm_static)
-include_directories( ${SOURCE_LIB} ${PROJECT_SOURCE_DIR} ${OPENGL_INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/glfw/include)
+target_link_libraries( ${EXEC_NAME} my_lib ${OPENGL_LIBRARIES} glm_static assimp)
+include_directories( ${SOURCE_LIB} ${PROJECT_SOURCE_DIR} ${OPENGL_INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/glfw/include 
+	${PROJECT_SOURCE_DIR}/assimp/include/)
 
 if( SYSUNIX)
 	find_package( GLEW REQUIRED)

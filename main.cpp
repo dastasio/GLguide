@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "global.h"
+#include "app.h"
 
 using namespace std;
 

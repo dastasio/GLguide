@@ -1,5 +1,9 @@
 #pragma once
 #include "global.h"
+#include "dav_model.h"
+#include "dav_sdl.h"
+#include "camera.h"
+#include "objs.h"
 
 class App {
 public:
@@ -39,7 +43,7 @@ private:
 			pntSpecLoc[4];
 
 	// OpenGL buffers
-	GLuint VAO, VBO, EBO, lightVAO, gProgram, lightProgram, diffuseTexture, specTexture;
+	GLuint VAO, VBO, EBO, lightVAO, gProgram, lightProgram;
 
 	// window settings
 	const GLfloat width = 1024, height = 720;
@@ -50,23 +54,16 @@ private:
 	SDL_GLContext thisContext;
 	
 	
-	glm::vec3 cubePositions[10] = {
-		glm::vec3( 0.0f,  0.0f,  0.0f),
-		glm::vec3( 2.0f,  5.0f, -15.0f),
-		glm::vec3(-1.5f, -2.2f, -2.5f),
-		glm::vec3(-3.8f, -2.0f, -12.3f),
-		glm::vec3( 2.4f, -0.4f, -3.5f),
-		glm::vec3(-1.7f,  3.0f, -7.5f),
-		glm::vec3( 1.3f, -2.0f, -2.5f),
-		glm::vec3( 1.5f,  2.0f, -2.5f),
-		glm::vec3( 1.5f,  0.2f, -1.5f),
-		glm::vec3(-1.3f,  1.0f, -1.5f)
-	};
-	
-	glm::vec3 pointLightPositions[4] = {
-		glm::vec3( 0.7f,  0.2f,  2.0f),
-		glm::vec3( 2.3f, -3.3f, -4.0f),
-		glm::vec3(-4.0f,  2.0f, -12.0f),
-		glm::vec3( 0.0f,  0.0f, -3.0f)
-	};
+	Model* nanosuit;
 };
+
+
+
+
+
+
+
+
+
+
+

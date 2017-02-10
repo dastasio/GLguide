@@ -3,8 +3,14 @@ R"SHADER(
 #define NUM_PLIGHTS 4
 
 struct Material {
-	sampler2D diffuse;
-	sampler2D specular;
+	sampler2D texture_diffuse0;
+	sampler2D texture_diffuse1;
+	sampler2D texture_diffuse2;
+	sampler2D texture_diffuse3;
+	sampler2D texture_specular0;
+	sampler2D texture_specular1;
+	sampler2D texture_specular2;
+	sampler2D texture_specular3;
 	float shineFactor;
 };
 
@@ -43,6 +49,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 frag, vec3 viewDir);
 
 void main() {
+/*
 	vec3 N = normalize(normal);
 	vec3 vDir = normalize(viewPos - fragPos);
 
@@ -53,11 +60,13 @@ void main() {
 		result += CalcPointLight( pointL[i], N, fragPos, vDir);
 	}
 	// Phase3: spotlight
+*/
+	vec3 result = vec3(texture(mater.texture_diffuse0, texCoordinates));
 
 	final_color = vec4(result, 1.0);
 }
 
-
+/*
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
 	vec3 lDir = normalize(-light.direction);
 
@@ -94,7 +103,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 frag, vec3 viewDir) {
 	specular *= atten;
 	return ( ambient + diffuse + specular);
 }
-
+*/
 
 )SHADER"
 

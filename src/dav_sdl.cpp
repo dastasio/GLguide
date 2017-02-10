@@ -31,11 +31,13 @@ SDL_Window* initSDL( SDL_GLContext &context,GLint w, GLint h) {
 			else {
 				// if context created successfully, init GLEW
 				SDL_GL_MakeCurrent(window, context);
+#if not defined __APPLE__
 				glewExperimental = GL_TRUE;
 				GLenum gErr = glewInit();
 				if (gErr != GLEW_OK) {
 					std::cerr << "ERROR: Could not initialize GLEW!\n" << glewGetErrorString(gErr);
 				}
+#endif
 
 				// if window creation successful, init SDL_IMAGE
 				GLint flags = IMG_INIT_PNG | IMG_INIT_JPG;
