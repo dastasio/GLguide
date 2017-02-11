@@ -4,7 +4,7 @@ GLuint loadTexture(const GLchar* path) {
 	// loading texture file
 	SDL_Surface* image = IMG_Load(path);
 	if (image == nullptr) {
-		std::cerr << "LOADING ERROR: Could not load " << path << std::endl << IMG_GetError();
+		std::cerr << "LOADING ERROR: Could not load " << path << std::endl << IMG_GetError() << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -21,7 +21,7 @@ GLuint loadTexture(const GLchar* path) {
 	
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->w, image->h, 0, GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
 	glGenerateMipmap(GL_TEXTURE_2D);
-
+	
 
 	// freeing memory
 	SDL_FreeSurface(image);

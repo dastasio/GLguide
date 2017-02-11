@@ -5,8 +5,13 @@
 #include <stdio.h>
 #include <iostream>
 #include <vector>
+#include <sstream>
+#if defined __APPLE__
+#include <OpenGL/gl3.h>
+#else
 #define GLEW_STATIC
 #include <GL/glew.h>
+#endif
 
 #ifdef _WIN32
 #define SDL_MAIN_HANDLED
@@ -22,10 +27,10 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/rotate_vector.hpp"
 
+// assimp library
+#include "assimp/Importer.hpp"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
 
 // including personal library
 #include "common.h"
-#include "app.h"
-#include "textures.h"
-#include "dav_sdl.h"
-#include "camera.h"

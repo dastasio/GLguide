@@ -11,7 +11,7 @@ enum camEnum {
 
 class Camera {
 public:
-	Camera();
+	Camera( glm::vec3 position = glm::vec3(0.0, 0.0, 3.0));
 	~Camera();
 
 	GLvoid move(camEnum dir, GLfloat speed);
@@ -21,6 +21,7 @@ public:
 
 	glm::mat4 getMatrix() { return camSpace; }
 	glm::vec3 getPosition() { return pos; }
+	glm::vec3 getTarget() { return N; }
 private:
 
 	glm::vec3 pos;
