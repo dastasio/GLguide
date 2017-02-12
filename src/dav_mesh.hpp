@@ -1,14 +1,18 @@
-//
-//  dav_mesh.hpp
-//  GLguide
-//
-//  Created by Davide on 2/11/17.
-//
-//
+#pragma once
+#include "global.h"
+#include "structs.h"
+using namespace std;
 
-#ifndef dav_mesh_hpp
-#define dav_mesh_hpp
-
-#include <stdio.h>
-
-#endif /* dav_mesh_hpp */
+class davMesh {
+public:
+	vector<Vertex> verts;
+	vector<GLuint> indices;
+	vector<Texture> textures;
+	
+	davMesh(vector<Vertex> v, vector<GLuint> inds, vector<Texture> tex);
+	GLvoid Draw(GLuint program);
+private:
+	GLuint VAO, VBO, EBO;
+	
+	GLvoid setupMesh();
+};

@@ -1,100 +1,24 @@
 #include "app.h"
+#include "dav_sdl.h"
+#include "common.h"
+
+#define FOV radians(45.0f)
+#define AR	1.42f
 
 using namespace glm;
 
-Camera* cam = new Camera( vec3(0.0, 0.3, 3.0));
-Obj* cube;
-Obj* floorModel;
 
 App::App() {
-	model = mat4(1.0);
-	view = cam->getMatrix();
-	projection = mat4(1.0);
-
-
 	initWindow();
-	initCube();
+	
+	cam = new Camera();
 	initBuffers();
 	initMatrices();
-	
-	nanosuit = new Model("models/nanosuit2.obj");
-    
-    std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
-    
-	locModel = glGetUniformLocation(gProgram, "model");
-	locView = glGetUniformLocation(gProgram, "view");
-	locProj = glGetUniformLocation(gProgram, "projection");
-	locViewPos = glGetUniformLocation(gProgram, "viewPos");
-
-	ligModel = glGetUniformLocation(lightProgram, "model");
-	ligView = glGetUniformLocation(lightProgram, "view");
-	ligProj = glGetUniformLocation(lightProgram, "projection");
-	ligPos = glGetUniformLocation(gProgram, "lightPos");
-	
-	matDiffLoc = glGetUniformLocation(gProgram, "mater.diffuse");
-	matSpecLoc = glGetUniformLocation(gProgram, "mater.specular");
-	matShineLoc = glGetUniformLocation(gProgram, "mater.shineFactor");
-	
-	dirDirLoc = glGetUniformLocation(gProgram, "dirL.direction");
-	dirAmbLoc = glGetUniformLocation(gProgram, "dirL.amb");
-	dirDiffLoc = glGetUniformLocation(gProgram, "dirL.diff");
-	dirSpecLoc = glGetUniformLocation(gProgram, "dirL.spec");
-	
-	for( long i = 0; i < 4; ++i) {
-		std::string name = "pointL[";
-		std::ostringstream conv;
-		conv << i;
-		
-		name.append(conv.str());
-		name.append("].position");
-		pntPosLoc[i] = glGetUniformLocation(gProgram, name.c_str());
-		
-		name.clear();
-		name = "pointL[";
-		name.append(conv.str());
-		name.append("].constant");
-		pntConstLoc[i] = glGetUniformLocation(gProgram, name.c_str());
-		
-		name.clear();
-		name = "pointL[";
-		name.append(conv.str());
-		name.append("].linear");
-		pntLinLoc[i] = glGetUniformLocation(gProgram, name.c_str());
-		
-		name.clear();
-		name = "pointL[";
-		name.append(conv.str());
-		name.append("].quadratic");
-		pntQuadLoc[i] = glGetUniformLocation(gProgram, name.c_str());
-		
-		name.clear();
-		name = "pointL[";
-		name.append(conv.str());
-		name.append("].amb");
-		pntAmbLoc[i] = glGetUniformLocation(gProgram, name.c_str());
-		
-		name.clear();
-		name = "pointL[";
-		name.append(conv.str());
-		name.append("].diff");
-		pntDiffLoc[i] = glGetUniformLocation(gProgram, name.c_str());
-		
-		name.clear();
-		name = "pointL[";
-		name.append(conv.str());
-		name.append("].spec");
-		pntSpecLoc[i] = glGetUniformLocation(gProgram, name.c_str());
-	}
 	
 }
 
 App::~App() {
-	// deallocating memory
 
-	delete &VAO;
-	delete &VBO;
-	
-	delete cam;
 }
 
 
@@ -103,12 +27,14 @@ App::~App() {
 /* initWindow();
 - parameters: VOID
 - returns: VOID
-- s.e.: starts a window using GLFW
+- s.e.: starts a window using SDL2
 */
 GLvoid App::initWindow() {
-	thisWindow = initSDL( thisContext, width, height);
-
-	glViewport(0, 0, width, height);
+	// creating window and setting viewport
+	main_window = initSDL( main_context, main_width, main_height);
+	glViewport(0, 0, main_width, main_height);
+	
+	
 	// setting clear color
 	glClearColor(0.1, 0.1, 0.1, 1.0);
 
@@ -123,7 +49,7 @@ GLvoid App::initWindow() {
 - s.e.: initializes projection matrix
 */
 GLvoid App::initProjection(GLfloat fov, GLfloat ar) {
-	projection = perspective(fov, ar, 0.1f, 500.0f);
+	projection = perspective(FOV, AR, 0.1f, 500.0f);
 }
 
 
@@ -137,47 +63,15 @@ GLvoid App::initProjection(GLfloat fov, GLfloat ar) {
 */
 GLvoid App::initBuffers() {
 	// linking shaders
-	gProgram = modelShader();
-	lightProgram = lightShader();
-	glUseProgram(gProgram);
-
-	glGenBuffers(1, &VBO);
-	glGenVertexArrays(1, &lightVAO);
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &EBO);
+	this->program = modelShader();
+	glUseProgram(this->program);
 	
-//	// VAO setup
-//	{
-//		glBindVertexArray(VAO);
-//		// sending cube data to GPU
-//		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-//		glBufferData(GL_ARRAY_BUFFER, cube->Capacity() + floorModel->Capacity(), nullptr, GL_STATIC_DRAW);
-//		GLsizeiptr off = cube->sendData(0);
-//		floorModel->sendData(off);
-//
-//		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-//		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
-//
-//		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), BUFFER_OFFSET(0));
-//		glEnableVertexAttribArray(0);
-//		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), BUFFER_OFFSET(3 * sizeof(GLfloat)));
-//		glEnableVertexAttribArray(1);
-//		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), BUFFER_OFFSET(6 * sizeof(GLfloat)));
-//		glEnableVertexAttribArray(2);
-//		glBindVertexArray(0);
-//		glBindBuffer(GL_ARRAY_BUFFER, 0);
-//	}
+	suit = new davModel("models/nanosuit2.obj");
 	
-	// setting up ligth VAO
-	{
-		glBindVertexArray(lightVAO);
-		glBindBuffer( GL_ARRAY_BUFFER, VBO);
-
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), BUFFER_OFFSET(0));
-		glEnableVertexAttribArray(0);
-		glBindVertexArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-	}
+	
+	locModel = glGetUniformLocation(this->program, "model");
+	locProj = glGetUniformLocation(this->program, "projection");
+	locView = glGetUniformLocation(this->program, "view");
 }
 
 
@@ -193,7 +87,10 @@ GLvoid App::initBuffers() {
 */
 GLvoid App::initMatrices() {
 	// model matrix stays I
+	model = mat4(1.0);
 
+	view = cam->getMatrix();
+	
 	// projection matrix
 	initProjection();
 }
@@ -208,25 +105,19 @@ GLvoid App::initMatrices() {
 GLvoid App::render() {
 	glEnable(GL_DEPTH_TEST);
 
-	glUseProgram(gProgram);
+	glUseProgram(program);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	// sending matrices
 	{
 		glUniformMatrix4fv(locView, 1, GL_FALSE, value_ptr(view));
 		glUniformMatrix4fv(locProj, 1, GL_FALSE, value_ptr(projection));
-		vec3 viewPos = cam->getPosition();
-		glUniform3f(locViewPos, viewPos.x, viewPos.y, viewPos.z);
-		
-		glUniform1i(matDiffLoc, 0);
-		glUniform1i(matSpecLoc, 1);
-		glUniform1f(matShineLoc, 512);
 		
 		
-		glUniform3f(dirDirLoc, 0.0, 2.0, 3.0);
-		glUniform3f(dirAmbLoc, 0.05, 0.05, 0.02);
-		glUniform3f(dirDiffLoc, 0.4, 0.4, 0.25);
-		glUniform3f(dirSpecLoc, 0.5, 0.5, 0.4);
+		model = translate(mat4(1.0), vec3(0.0, -1.75, 0.0));
+		model = scale(model, vec3(0.2));
+		glUniformMatrix4fv(locModel, 1, GL_FALSE, value_ptr(model));
+		
 		
 	}
 	
@@ -236,7 +127,7 @@ GLvoid App::render() {
 //		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		
 		
-		nanosuit->Draw(gProgram);
+		suit->Draw(program);
 		
 		
 //		glBindVertexArray(0);
@@ -245,7 +136,7 @@ GLvoid App::render() {
 	
 	
 
-	SDL_GL_SwapWindow(thisWindow);
+	SDL_GL_SwapWindow(main_window);
 }
 
 
@@ -321,16 +212,10 @@ GLboolean App::grabInput() {
 
 	// reading mouse input
 	mouseState = SDL_GetRelativeMouseState(&mX, &mY);
-	cam->turn(CAM_ROT_YAW, -(mX / width) * 2 * M_PI);
-	cam->turn(CAM_ROT_PITCH, -(mY / height) * 2 * M_PI);
+	cam->turn(CAM_ROT_YAW, -(mX / main_width) * 2 * M_PI);
+	cam->turn(CAM_ROT_PITCH, -(mY / main_height) * 2 * M_PI);
 	return GL_TRUE;
 }
-
-
-GLvoid App::initCube() {
-}
-
-
 
 
 
