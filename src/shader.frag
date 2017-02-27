@@ -69,7 +69,7 @@ void main() {
 	}
 	// Phase3: spotlight
 */
-	vec3 result = vec3(texture(mater.texture_diffuse3, texCoordinates));
+	vec3 result = vec3(texture(mater.texture_diffuse1, texCoordinates));
 
 	final_color = vec4(result, 1.0);
 }

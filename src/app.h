@@ -22,7 +22,7 @@ private:
 	Camera* cam;
 	
 	// window data
-	const GLint main_width = 1024, main_height = 720;
+	const GLfloat main_width = 1024, main_height = 720;
 	SDL_Window* main_window;
 	SDL_GLContext main_context;
 	

@@ -27,6 +27,7 @@ GLvoid davModel::loadModel(string path) {
 		exit(EXIT_FAILURE);
 	}
 	directory = path.substr(0, path.find_last_of('/'));
+	directory.append("/");
 	
 	processNode(scene->mRootNode, scene);
 }
@@ -114,6 +115,7 @@ vector<Texture> davModel::loadMaterialTexture(aiMaterial *mat, aiTextureType typ
 		if( !skip) {
 			Texture texture;
 			string tmp = str.C_Str();
+			//tmp.append(str.C_Str());
 			texture.ID = loadTexture((this->directory + tmp).c_str());
 			cout << (this->directory + tmp).c_str();
 			texture.type = typeName;

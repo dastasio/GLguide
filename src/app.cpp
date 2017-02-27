@@ -66,7 +66,7 @@ GLvoid App::initBuffers() {
 	this->program = modelShader();
 	glUseProgram(this->program);
 	
-	suit = new davModel("models/nanosuit2.obj");
+	suit = new davModel("models/wolf.dae");
 	
 	
 	locModel = glGetUniformLocation(this->program, "model");
@@ -115,7 +115,7 @@ GLvoid App::render() {
 		
 		
 		model = translate(mat4(1.0), vec3(0.0, -1.75, 0.0));
-		model = scale(model, vec3(0.2));
+		model = scale(model, vec3(0.009));
 		glUniformMatrix4fv(locModel, 1, GL_FALSE, value_ptr(model));
 		
 		
@@ -214,6 +214,7 @@ GLboolean App::grabInput() {
 	mouseState = SDL_GetRelativeMouseState(&mX, &mY);
 	cam->turn(CAM_ROT_YAW, -(mX / main_width) * 2 * M_PI);
 	cam->turn(CAM_ROT_PITCH, -(mY / main_height) * 2 * M_PI);
+	
 	return GL_TRUE;
 }
 
