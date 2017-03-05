@@ -117,7 +117,6 @@ vector<Texture> davModel::loadMaterialTexture(aiMaterial *mat, aiTextureType typ
 			string tmp = str.C_Str();
 			//tmp.append(str.C_Str());
 			texture.ID = loadTexture((this->directory + tmp).c_str());
-			cout << (this->directory + tmp).c_str();
 			texture.type = typeName;
 			texture.path = str;
 			texts.push_back(texture);

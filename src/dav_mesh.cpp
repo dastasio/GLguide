@@ -53,7 +53,6 @@ GLvoid davMesh::Draw(GLuint program) {
 		
 		name.append( num.str());
 		glUniform1i( glGetUniformLocation( program, ("mater." + name).c_str()), i);
-		cout << ("mater." + name).c_str() << endl;
 		glBindTexture(GL_TEXTURE_2D, textures[i].ID);
 	}
 	glActiveTexture(GL_TEXTURE0);

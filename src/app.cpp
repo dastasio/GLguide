@@ -8,14 +8,18 @@
 using namespace glm;
 
 
-App::App() {
+App::App(GLint window_width, GLint window_height) {
+	this->main_width = window_width;
+	this->main_height = window_height;
+	
 	initWindow();
 	
-	cam = new Camera();
+	cam = new Camera(vec3(0.0, 0.0, 3.0), GL_TRUE);
 	initBuffers();
 	initMatrices();
 	
 }
+
 
 App::~App() {
 
@@ -31,7 +35,7 @@ App::~App() {
 */
 GLvoid App::initWindow() {
 	// creating window and setting viewport
-	main_window = initSDL( main_context, main_width, main_height);
+	main_window = initSDL (main_context, main_width, main_height);
 	glViewport(0, 0, main_width, main_height);
 	
 	
@@ -41,18 +45,6 @@ GLvoid App::initWindow() {
 	// setting depth buffer test
 	glEnable(GL_DEPTH_TEST);
 }
-
-
-/* initCube();
-- parameters: VOID
-- returns: VOID
-- s.e.: initializes projection matrix
-*/
-GLvoid App::initProjection(GLfloat fov, GLfloat ar) {
-	projection = perspective(FOV, AR, 0.1f, 500.0f);
-}
-
-
 
 
 /* initBuffers();
@@ -68,9 +60,7 @@ GLvoid App::initBuffers() {
 	
 	suit = new davModel("models/wolf.dae");
 	
-	
 	locModel = glGetUniformLocation(this->program, "model");
-	locProj = glGetUniformLocation(this->program, "projection");
 	locView = glGetUniformLocation(this->program, "view");
 }
 
@@ -90,9 +80,6 @@ GLvoid App::initMatrices() {
 	model = mat4(1.0);
 
 	view = cam->getMatrix();
-	
-	// projection matrix
-	initProjection();
 }
 
 
@@ -111,8 +98,6 @@ GLvoid App::render() {
 	// sending matrices
 	{
 		glUniformMatrix4fv(locView, 1, GL_FALSE, value_ptr(view));
-		glUniformMatrix4fv(locProj, 1, GL_FALSE, value_ptr(projection));
-		
 		
 		model = translate(mat4(1.0), vec3(0.0, -1.75, 0.0));
 		model = scale(model, vec3(0.009));
@@ -171,20 +156,9 @@ GLboolean App::grabInput() {
 	GLbitfield mouseState;
 	GLint mX, mY;
 	const GLubyte* keystate = SDL_GetKeyboardState(nullptr);
-	static GLfloat fov = radians(45.0f);
 
 	GLfloat speed = 0.2;
 	// reading keyboard input
-	if (keystate[SDL_SCANCODE_UP]) {
-		fov += 0.05;
-		if (fov >= M_PI / 2) fov = M_PI / 2;
-		initProjection(fov);
-	}
-	if (keystate[SDL_SCANCODE_DOWN]) {
-		fov -= 0.05;
-		if (fov <= 0.1) fov = 0.1;
-		initProjection(fov);
-	}
 	if (keystate[SDL_SCANCODE_RSHIFT]) {
 		speed = 0.05;
 	}

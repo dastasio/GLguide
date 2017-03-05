@@ -6,12 +6,11 @@
 class App {
 public:
 	
-	App();
+	App(GLint window_width = 1024, GLint window_height = 720);
 	~App();
 
 	// init functions
 	GLvoid initWindow();
-	GLvoid initProjection(GLfloat fov = glm::radians(45.0f), GLfloat ar = 1.42f);
 
 	GLvoid initBuffers();
 	GLvoid initMatrices();
@@ -22,7 +21,7 @@ private:
 	Camera* cam;
 	
 	// window data
-	const GLfloat main_width = 1024, main_height = 720;
+	GLfloat main_width, main_height;
 	SDL_Window* main_window;
 	SDL_GLContext main_context;
 	
@@ -36,8 +35,8 @@ private:
 	
 	davModel* suit;
 	
-	glm::mat4 projection, model, view;
-	GLuint locProj, locModel, locView;
+	glm::mat4 model, view;
+	GLuint locModel, locView;
 };
 
 

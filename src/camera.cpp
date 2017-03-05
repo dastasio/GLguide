@@ -2,11 +2,39 @@
 
 using namespace glm;
 
-Camera::Camera( vec3 position) {
+
+/* constructor();
+ - parameters: 
+	position, where the new camera is located
+	perspective, set to TRUE if camera is perspective, FALSE if orthographic
+	nearPlane and farPlane, near and far planes of clipping space
+	ar, aspect-ratio in form "with / height"
+	fov, vertical field of view
+	height_res, vertical resolution of window, used only if cam is ortho
+*/
+Camera::Camera( vec3 position, GLboolean perspective,
+			   GLfloat nearPlane, GLfloat farPlane,
+			   GLfloat ar, GLfloat fov, GLfloat height_res) {
+	
+	// initializing private variables
+	this->isPerspective = perspective;
 	camSpace = mat4(1.0);
 	pos = position;
 
-	pointCamera(pos,vec3(0.0, 0.0,-1.0), vec3( 0.0, 1.0, 0.0));
+	// calling function to construct camera matrix
+	this->pointCamera(pos,vec3(0.0, 0.0,-1.0), vec3( 0.0, 1.0, 0.0));
+	
+	// constructing appropriate projection matrix,
+	// based on given parameters
+	if (perspective) {
+		this->projection = glm::perspective(fov, ar,
+											nearPlane, farPlane);
+	}
+	else {
+		this->projection = ortho(0.f, height_res * ar,
+								 height_res, 0.f,
+								 nearPlane, farPlane);
+	}
 }
 
 Camera::~Camera() {
@@ -24,7 +52,11 @@ Camera::~Camera() {
  - s.e.: updates private 'pos' vector with camera new position
 */
 GLvoid Camera::move(camEnum dir, GLfloat speed) {
+	// saving current y position,
+	// used for limiting vertical movement when moving forward or sideways
 	GLfloat tmpY = pos.y;
+	
+	// transformation is applied based on direction of movement
 	switch (dir) {
 	case CAM_MOVE_RIGHT:
 		pos += normalize(cross(N, U)) * speed;
@@ -42,13 +74,14 @@ GLvoid Camera::move(camEnum dir, GLfloat speed) {
 	default:
 		break;
 	}
-
+	
+	// calling function to update matrix
 	pointCamera(pos, N, U);
 }
 
 
 /* turn( GLboolean, GLfloat);
- - parameters: bool indicating direction of rotation; angle of rotation
+ - parameters: direction of rotation; angle of rotation
  - returns: VOID
  - s.e.: calls pointCamera
 */
@@ -60,8 +93,8 @@ GLvoid Camera::turn(camEnum dir, GLfloat angle) {
 		break;
 	case CAM_ROT_PITCH:
 		// limiting up and down rotation
-		if (N.y >= 0.8 && angle >= 0) angle = 0;
-		else if (N.y <= -0.8 && angle <= 0) angle = 0;
+		if (N.y >= 0.9 && angle >= 0) angle = 0;
+		else if (N.y <= -0.9 && angle <= 0) angle = 0;
 		
 		N = rotate(N, angle, V);
 		break;
@@ -69,7 +102,7 @@ GLvoid Camera::turn(camEnum dir, GLfloat angle) {
             break;
 	}
 
-	pointCamera( pos, N, U);
+	pointCamera(pos, N, U);
 }
 
 
