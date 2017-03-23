@@ -46,7 +46,6 @@ SDL_Window* initSDL( SDL_GLContext &context,GLint w, GLint h) {
 					exit(EXIT_FAILURE);
 				}
 				else {
-					std::cout << "INIT SUCCESS: SDL initialized successfully!\n";
 					glViewport(0, 0, w, h);
 					return window;
 				}

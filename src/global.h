@@ -1,11 +1,8 @@
 #pragma once
 
 // including external libraries
-#include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
-#include <vector>
-#include <sstream>
 #if defined __APPLE__
 #include <OpenGL/gl3.h>
 #else
@@ -31,6 +28,3 @@
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
-
-// including personal library
-#include "common.h"
