@@ -14,6 +14,10 @@ namespace den {
 							 const string& vertSourcePath,
 							 const string& fragSourcePath);
 		
+		GLvoid Use(string name) {
+			glUseProgram(this->programs[name]);
+		}
+		
 		const GLuint GetShader(const string& k) { return this->programs[k];}
 		
 	private:

@@ -1,11 +1,11 @@
 cmake_minimum_required( VERSION 3.1)
 
 project( GLguide)
-set( EXEC_NAME "Cube")
+set( EXEC_NAME "DEngine")
 
 set( EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin")
 set( LIBRARY_OUTPUT_PATH ${EXECUTABLE_OUTPUT_PATH})
-set( SOURCE_LIB "${PROJECT_SOURCE_DIR}/src")
+set( DEN_LIBS "${PROJECT_SOURCE_DIR}/code")
 set( CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmodules")
 
 message( "system name: " ${CMAKE_SYSTEM})
@@ -30,7 +30,7 @@ set( ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set( BUILD_ASSIMP_SAMPLES OFF CACHE BOOL "" FORCE)
 
 add_executable( ${EXEC_NAME} "main.cpp")
-add_subdirectory( ${SOURCE_LIB}) # adding my library
+add_subdirectory( ${DEN_LIBS}) # adding my libraries
 add_subdirectory( ${PROJECT_SOURCE_DIR}/glm) # adding glm library
 add_subdirectory( ${PROJECT_SOURCE_DIR}/assimp) # assimp library
 
@@ -38,8 +38,8 @@ add_subdirectory( ${PROJECT_SOURCE_DIR}/assimp) # assimp library
 # setting c++ version
 target_compile_features( ${EXEC_NAME} PRIVATE cxx_nullptr)
 
-target_link_libraries( ${EXEC_NAME} my_lib ${OPENGL_LIBRARIES} glm_static assimp)
-include_directories( ${SOURCE_LIB} ${PROJECT_SOURCE_DIR} ${OPENGL_INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/glfw/include 
+target_link_libraries( ${EXEC_NAME} mans denAssets denShaders ${OPENGL_LIBRARIES} glm_static assimp)
+include_directories( ${DEN_LIBS}/den ${DEN_LIBS}/managers ${PROJECT_SOURCE_DIR} ${OPENGL_INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/glfw/include 
 	${PROJECT_SOURCE_DIR}/assimp/include/)
 
 if( SYSUNIX)

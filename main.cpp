@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "global.h"
 #include "ShaderMan.hpp"
-#include "dav_sdl.h"
+#include "WindowMan.hpp"
 
 using namespace std;
 
@@ -10,14 +10,16 @@ int main(int argc, char* argv[]) {
 	SDL_SetMainReady();
 
 	den::ShaderMan* sman = new den::ShaderMan();
+	den::WindowMan* wman = new den::WindowMan();
 	
-	SDL_GLContext cont;
-	SDL_Window* window = initSDL(cont);
-	glViewport(0, 0, 1024, 720);
+	den::DEN_Window window;
+	den::DEN_Context context;
+	wman->CreateWindow(window, context);
 	
 	sman->CreateProgram("main", "shader.vert", "shader.frag");
+	sman->Use("main");
 	
-	glUseProgram(sman->GetShader("main"));
+	
 	GLfloat triangle[] = {
 		-0.75, -0.75, 0.0,
 		 0.75, -0.75, 0.0,
@@ -36,18 +38,7 @@ int main(int argc, char* argv[]) {
 	glEnableVertexAttribArray(0);
 	
 	
-	GLboolean run = GL_TRUE;
-	while(run) {
-		SDL_Event e;
-		while(SDL_PollEvent(&e)) {
-			if(e.type == SDL_QUIT)
-				run = GL_FALSE;
-		}
-		
-		glClear(GL_COLOR_BUFFER_BIT);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-		SDL_GL_SwapWindow(window);
-	}
+	wman->Loop();
 	
 	SDL_Quit();
 	return 0;
